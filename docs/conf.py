@@ -55,8 +55,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # a list of builtin themes.
 #
 # html_theme = 'pytorch_sphinx_theme'
-# html_theme_path = ["D:\home\Arthur\Documents\Informatique\Python\pytorch_sphinx_theme-master"]
-html_theme = 'sphinx_rtd_theme'
+html_theme_path = ["D:\home\Arthur\Documents\Informatique\Python\pytorch_sphinx_theme-master"]
+# html_theme = 'sphinx_rtd_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
