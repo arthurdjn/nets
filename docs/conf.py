@@ -63,4 +63,5 @@ html_theme_path = ["D:\home\Arthur\Documents\Informatique\Python\pytorch_sphinx_
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-mathjax_path="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+master_doc = 'index'
+# mathjax_path="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
