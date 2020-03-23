@@ -8,8 +8,6 @@ Welcome to NETS documentation!
 ==============================
 
 
-.. image:: source/images/nets.png
-
 A python package for deep learning application
 
 

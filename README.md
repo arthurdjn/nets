@@ -1,5 +1,6 @@
 ![NETS](docs/source/images/nets.png)
 
+
 **NETS** is a Python package for deep learning application and networks construction
 from scratch using **numpy**
 and an autograd system (you can switch to vanilla gradient update too).
@@ -8,7 +9,7 @@ and an autograd system (you can switch to vanilla gradient update too).
 # Getting Started
 
 ### About
-**NETS** is a vanilla Deep Learning framework, made using only **NumPy**.
+**NETS** is a vanilla Deep Learning framework, made using only **numpy**.
 This project was first introduced as an assignment I made at the 
 [University of Oslo](https://www.uio.no/studier/emner/matnat/ifi/IN5400/), which is similar to the second
 assignment from [Stanford University](http://cs231n.stanford.edu/syllabus.html).
@@ -31,13 +32,13 @@ packages can offer a better experience if installed (saving checkpoints and mode
 
 ### Installation
 
-To install this package from [PyPi](https://pypi.org):
+To install this package from [PyPi](https://pypi.org)
 
 ````css
 $ pip install nets
 ````
 
-or from this repository:
+or from this repository
 ````css
 $ git clone https://github.com/arthurdjn/nets
 $ cd nets
