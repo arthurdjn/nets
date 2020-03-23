@@ -4,20 +4,20 @@ Loss functions evaluate the precision and correctness of a model's predictions. 
 another.
 """
 
-
 from abc import ABC, abstractmethod
 import numpy as np
 
 from nets.nn.module import Module
 from scipy.special import softmax
 
-1
+
 class Loss(Module):
     r"""A loss function evaluate the correctness of a set of predictions regarding gold-labels.
     The predictions should be un-corrected, *ie* no transformations like ``Softmax`` should have been used before.
     The loss function will do the transformation if necessary.
     The attribute ``history`` keeps track of the cost when the loss function is called.
     """
+
     def __init__(self):
         self.history = []
 
@@ -44,14 +44,16 @@ class Loss(Module):
         self.history.append(cost)
         return cost
 
+
 class MSE(Loss):
     r"""Mean Square Error Loss, defined as:
 
-    .. math:
+    .. math::
 
         \text{MSE} = \frac{1}{N}\sum_{i=1}^{c}(predictions - labels)^2
 
     """
+
     def __init__(self):
         super(MSE, self).__init__()
 
@@ -70,11 +72,12 @@ class CrossEntropyLoss(Loss):
     r"""Cross Entropy Loss. First, a softmax transformation is used to map the predictions between :math:`[0, 1]`,
     then the cost is computed:
 
-    .. math:
+    .. math::
 
         \text{CrossEntropyLoss} = \frac{-1}{N} \sum_{i=1}^{c}labels_{i}\log(pred_{i})
 
     """
+
     def __init__(self):
         super(CrossEntropyLoss, self).__init__()
 
