@@ -1,8 +1,8 @@
-# NETS
-
 ![NETS](docs/source/images/nets.png)
 
-Neural Network (Dense Neural Network and Convolutional Neural Network) from scratch with NumPy.
+**NETS** is a Python package for deep learning application and networks construction
+from scratch using **numpy**
+and an autograd system (you can switch to vanilla gradient update too).
 
 
 # Getting Started
