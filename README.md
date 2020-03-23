@@ -1,6 +1,6 @@
 # NETS
 
-<img src="docs/source/images/nets.png" height="40%">
+![NETS](docs/source/images/nets.png)
 
 Neural Network (Dense Neural Network and Convolutional Neural Network) from scratch with NumPy.
 
