@@ -1,5 +1,0 @@
-numpy
-scipy
-sklearn
-json
-time
