@@ -28,4 +28,4 @@ def one_hot(Y, num_classes):
     batch_size = len(Y)
     Y_tilde = np.zeros((batch_size, num_classes))
     Y_tilde[np.arange(batch_size), Y] = 1
-    return Y_tilde
+    return Y_tilde.astype(int)

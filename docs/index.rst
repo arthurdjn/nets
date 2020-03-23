@@ -8,7 +8,7 @@ Welcome to NETS documentation!
 ==============================
 
 
-.. image:: images/nets.png
+.. image:: source/images/nets.png
 
 A python package for deep learning application
 

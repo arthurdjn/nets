@@ -1,75 +1,91 @@
 from abc import ABC, abstractmethod
 import numpy as np
+
+from nets.nn.module import Module
+from scipy.special import softmax
 from nets.utils import one_hot
 
 
-# class Loss(ABC):
-#
-#     def __init__(self):
-#         self.cost_history = []
-#         self.correct_history = []
-#
-#     @abstractmethod
-#     def forward(self, *args, **kwargs):
+# class Loss:
+#     def loss(self, predicted, actual) -> float:
 #         raise NotImplementedError
 #
-#     def cost(self):
-#         return self.cost_history[-1]
-#
-#     def correct(self):
-#         return self.correct_history[-1]
-#
-#     def __call__(self, *args, **kwargs):
-#         cost, correct = self.forward(*args, **kwargs)
-#         self.cost_history.append(cost)
-#         self.correct_history.append(correct)
-#         return cost, correct
-#
-#
-# class CrossEntropyLoss(Loss):
-#
-#     def __init__(self):
-#         super(CrossEntropyLoss, self).__init__()
-#
-#     def forward(self, outputs, labels):
-#         """Compute the cross entropy cost function.
-#
-#         Args:
-#             outputs (numpy.array): numpy array of floats with shape (num_classes, batch_size).
-#             labels (numpy.array): numpy array of floats with shape (num_classes, batch_size).
-#                 Collection of one-hot encoded true input labels
-#
-#         Returns:
-#             cost: Scalar float: 1/m * sum_i^m sum_j^n y_reference_ij log y_proposed_ij
-#             num_correct: Scalar integer
-#
-#         """
-#         num_classes, batch_size = outputs.shape
-#         cost = - 1 / batch_size * np.sum(np.multiply(np.log(outputs), labels))
-#
-#         # Number of correct answers
-#         predicted_classes = np.argmax(outputs, axis=0)
-#         predicted_classes = one_hot(predicted_classes, num_classes)
-#         num_correct = np.sum(predicted_classes * labels)
-#
-#         return cost, num_correct
+#     def grad(self, predicted, actual):
+#         raise NotImplementedError
 
 
-class Loss:
-    def loss(self, predicted, actual) -> float:
+class Loss(Module):
+    r"""A loss function evaluate the correctness of a set of predictions regarding gold-labels.
+    The predictions should be un-corrected, *ie* no transformations like ``Softmax`` should have been used before.
+    The loss function will do the transformation if necessary.
+    The attribute ``history`` keeps track of the cost when the loss function is called.
+    """
+    def __init__(self):
+        self.history = []
+
+    def forward(self, predictions, labels):
+        r"""Compute the cross entropy cost function.
+
+        Args:
+            predictions (numpy.array): tensor of un-normalized floats with shape :math:`(N, c)`.
+            labels (numpy.array): tensor of integer values with shape :math:`(N)`.
+
+        Returns:
+            cost (float): the cost regarding the loss function.
+        """
         raise NotImplementedError
 
-    def grad(self, predicted, actual):
-        raise NotImplementedError
+    def cost(self):
+        return self.cost_history[-1]
 
+    def correct(self):
+        return self.correct_history[-1]
+
+    def __call__(self, *inputs):
+        cost = self.forward(*inputs)
+        self.history.append(cost)
+        return cost
 
 class MSE(Loss):
-    """
-    MSE is mean squared error, although we're
-    just going to do total squared error
-    """
-    def loss(self, predicted, actual) -> float:
-        return np.sum((predicted - actual) ** 2)
+    r"""Mean Square Error Loss, defined as:
 
-    def grad(self, predicted, actual):
-        return 2 * (predicted - actual)
+    .. math:
+        \text{MSE} = \frac{1}{N}\sum_{i=1}^{c}(predictions - labels)^2
+    """
+    def __init__(self):
+        super(MSE, self).__init__()
+
+    def forward(self, predicted, labels):
+        assert labels.shape == predicted.shape, \
+            "labels shape {} and predictions shape {} should match".format(labels.shape, predictions.shape)
+        return np.sum((predicted - labels) ** 2)
+
+    def backward(self, predictions, labels):
+        assert labels.shape == predicted.shape, \
+            "labels shape {} and predictions shape {} should match".format(labels.shape, predictions.shape)
+        return 2 * (predictions - labels)
+
+
+class CrossEntropyLoss(Loss):
+    r"""Cross Entropy Loss. First, a softmax transformation is used to map the predictions between :math:`[0, 1]`,
+    then the cost is computed:
+
+    .. math:
+        \text{CrossEntropyLoss} = \frac{-1}{N} \sum_{i=1}^{c}labels_{i}\log(pred_{i})
+    """
+    def __init__(self):
+        super(CrossEntropyLoss, self).__init__()
+
+    def forward(self, predictions, labels):
+        assert labels.dtype == int, "unsupported labels type {} for cross entropy loss".format(predictions.dtype)
+        num_classes, batch_size = predictions.shape
+        cost = - 1 / batch_size * np.sum(np.multiply(np.log(predictions), labels))
+        # Number of correct answers
+        # predicted_classes = np.argmax(outputs, axis=0)
+        # predicted_classes = one_hot(predicted_classes, num_classes)
+        # num_correct = np.sum(predicted_classes * labels)
+        return cost
+
+    def backward(self, predictions, labels):
+        assert labels.dtype == int, "unsupported labels type {} for cross entropy loss".format(predictions.dtype)
+        return predictions - labels
