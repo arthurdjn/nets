@@ -40,9 +40,13 @@ class SGD(Optimizer):
         super().__init__(module)
         self.lr = lr
 
-    def step(self):
-        for module in self.module.modules():
-            for key in module._params:
-                module._params[key] = module._params[key] - self.lr * module._grads[key]
+    def step(self, module):
+        for parameter in module.parameters():
+            parameter -= parameter.grad * self.lr
+
+    # def step(self):
+    #     for module in self.module.modules():
+    #         for key in module._params:
+    #             module._params[key] = module._params[key] - self.lr * module._grads[key]
 
 

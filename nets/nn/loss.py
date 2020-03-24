@@ -74,7 +74,7 @@ class CrossEntropyLoss(Loss):
 
     .. math::
 
-        \text{CrossEntropyLoss} = \frac{-1}{N} \sum_{i=1}^{c}labels_{i}\log(pred_{i})
+        \text{CrossEntropyLoss} = - \frac{1}{N} \sum_{i=1}^{c}labels_{i}\log(pred_{i})
 
     """
 

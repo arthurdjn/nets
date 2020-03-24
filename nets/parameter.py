@@ -16,6 +16,4 @@ class Parameter(Tensor):
             data = np.random.randn(*shape)
         elif data is None and shape is None:
             data = []
-        self.data = data
-        self.shape = data.shape
-        # super().__init__(data, requires_grad=True)
+        super().__init__(data, requires_grad=True)
