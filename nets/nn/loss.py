@@ -6,7 +6,7 @@ another.
 
 from abc import ABC, abstractmethod
 import numpy as np
-
+import nets
 from nets.nn.module import Module
 from scipy.special import softmax
 
@@ -60,7 +60,7 @@ class MSE(Loss):
     def forward(self, predictions, labels):
         assert labels.shape == predictions.shape, \
             "labels shape {} and predictions shape {} should match".format(labels.shape, predictions.shape)
-        return np.sum((predictions - labels) ** 2)
+        return nets.sum((predictions - labels) ** 2)
 
     def backward(self, predictions, labels):
         assert labels.shape == predictions.shape, \

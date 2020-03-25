@@ -1,4 +1,0 @@
-"""
-Defines tensor operations.
-"""
-

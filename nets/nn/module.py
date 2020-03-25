@@ -18,6 +18,7 @@ class Module(ABC):
     Abstract Module architecture. All models used to transform tensors should extends from this class to benefits
     ``forward`` and ``backward`` propagation rules.
     """
+
     def __init__(self, *args, **kwargs):
         self.training = True
         self._modules = {}
@@ -32,7 +33,6 @@ class Module(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod
     def backward(self, *outputs):
         """One backward step."""
         raise NotImplementedError
@@ -44,12 +44,11 @@ class Module(ABC):
     def eval(self):
         """Set the ``training`` attribute to evaluation mode."""
         self.training = False
-    
+
     def add(self, *modules):
         for module in modules:
-            class_name = module.__class__.__name__.lower()
             idx = len(self._modules)
-            name = f"{class_name}{idx}"
+            name = f"{idx}"
             setattr(self, name, module)
             self._modules[name] = module
 
@@ -71,26 +70,43 @@ class Module(ABC):
         for module in self.modules():
             yield module._grads
 
+    def zero_grad(self):
+        for parameter in self.parameters():
+            parameter.zero_grad()
+
+    def get_name(self):
+        """Quick access to get the name of a module.
+
+        Returns:
+            name (string): module's name
+        """
+        return self.__class__.__name__
+
+    def inner_repr(self):
+        """Return the representation of a single module.
+        This method should be unique for each modules.
+
+        Returns:
+            repr (string): the representation of one module.
+        """
+        return ""
+
     def __call__(self, *inputs):
         return self.forward(*inputs)
 
+    def __repr__(self):
+        string = f"{self.get_name()}("
+        tab = "   "
+        for key, module in self._modules.items():
+            string += f"\n{tab}({key}): {module.get_name()}({module.inner_repr()})"
+        return f'{string}\n)'
 
-    # def info(self, tab=''):
-    #     string = ""
-    #     if self.modules() == {}:
-    #         string += info_layer(self, tab=tab)
-    #     else:
-    #         for module in self.modules().values():
-    #             if module.modules() == {}:
-    #                 string += info_layer(module, tab=tab)
-    #             else:
-    #                 module.info()
-    #     return string
-    #
-    # def __str__(self):
-    #     """Display model's architecture information."""
-    #     model_name = str(self.__class__.__name__)
-    #     string = f"{model_name} Module:"
-    #     string += '\n'
-    #     string += self.info(tab='\t')
-    #     return string
+    def __setattr__(self, key, value):
+        # First initialize the attribute we want to add
+        self.__dict__[key] = value
+        # Then update the inner dictionary '_modules', '_params'
+        if isinstance(value, Module):
+            self._modules[key] = value
+        elif isinstance(value, Parameter):
+            self._params[key] = value
+

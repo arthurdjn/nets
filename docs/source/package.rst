@@ -2,8 +2,10 @@
 nets
 ====
 
-**NETS** is divided in four main sub-packages.
-The first one,
+**NETS** is divided in five main sub-packages:
+
+- `autograd <nets.autograd>`_ refers to the autograd system used,
+
 - `nn <nets.nn>`_ refers to the core of the package, *ie* deep network models,
 
 - `optim <nets.optim>`_ refers to optimizers used during the backpropagation to update weights and biases,
@@ -11,6 +13,36 @@ The first one,
 - `data <nets.data>`_ refers to array container, like training and testing examples with their labels,
 
 - `datasets <nets.datasets>`_ refers to popular machine learning libraries for image analysis and NLP.
+
+====
+nets
+====
+
+.. automodule:: nets.tensor
+    :members:
+
+=============
+nets.autograd
+=============
+
+nets.autograd.hook
+==================
+
+.. automodule:: nets.autograd.hook
+    :members:
+
+nets.autograd.parameter
+=======================
+
+.. automodule:: nets.autograd.parameter
+    :members:
+
+nets.autograd.ops
+=================
+
+.. automodule:: nets.autograd.ops
+    :members:
+
 
 
 =======

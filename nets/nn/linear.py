@@ -29,9 +29,9 @@ class Linear(Module):
         super(Linear, self).__init__()
         self.input_dim = input_dim
         self.output_dim = output_dim
-        self.init_params()
-        self.bias = self._params['b']
-        self.weight = self._params['w']
+        # self.init_params()
+        self.weight = Parameter(shape=(self.input_dim, self.output_dim))
+        self.bias = Parameter(shape=(self.output_dim,))
 
     def init_params(self, mode=None):
         r"""Initialize the parameters dictionary.
@@ -40,16 +40,17 @@ class Linear(Module):
         The initialization can be changed with ``mode`` parameter, between the default uniform :math:`\mathcal{U}`
         initialization or :math:`\text{He et al. \mathcal{N}(0, \frac{1}{input_dim}}`.
         """
-        if mode == 'uniform':
-            mu = 0
-            var = 2 / self.output_dim
-            sigma = np.sqrt(var)
-            weight_shape = (self.input_dim, self.output_dim)
-            self._params["w"] = Parameter(np.random.normal(loc=mu, scale=sigma, size=weight_shape))
-            self._params["b"] = Parameter(np.zeros((self.output_dim,)))
-        else:
-            self._params["w"] = Parameter(shape=(self.input_dim, self.output_dim))
-            self._params["b"] = Parameter(shape=(self.output_dim,))
+        # if mode == 'uniform':
+        #     mu = 0
+        #     var = 2 / self.output_dim
+        #     sigma = np.sqrt(var)
+        #     weight_shape = (self.input_dim, self.output_dim)
+        #     self._params["w"] = Parameter(np.random.normal(loc=mu, scale=sigma, size=weight_shape))
+        #     self._params["b"] = Parameter(np.zeros((self.output_dim,)))
+        # else:
+        #     self._params["w"] = Parameter(shape=(self.input_dim, self.output_dim))
+        #     self._params["b"] = Parameter(shape=(self.output_dim,))
+        pass
 
     def forward(self, x):
         r""" Forward pass. Compute the linear transformation and save the results in the `_cache`, which will be
@@ -63,7 +64,7 @@ class Linear(Module):
         assert x.shape[1] == self.input_dim, 'dot product impossible with ' \
                                              'shape {} and {}'.format(x.shape, self._params['w'].shape)
         # Linear combination
-        z = np.dot(x, self._params['w']) + self._params['b']
+        z = x @ self.weight + self.bias
         # Keep track of inputs for naive back-propagation
         self._cache['x'] = x
         return z
@@ -78,7 +79,7 @@ class Linear(Module):
         coef = 1 / grad.shape[0]  # Normalize by the batch_size
         # Get parameters
         x = self._cache['x']
-        w = self._params['w']
+        w = self.weight
         # Compute the gradients
         dz = grad
         dw = coef * np.dot(x.T, dz)
@@ -89,6 +90,9 @@ class Linear(Module):
         # Return the new downstream gradient
         grad = np.dot(dz, w.T)
         return grad
+
+    def inner_repr(self):
+        return f"input_dim={self.input_dim}, output_dim={self.output_dim}, bias={True if self.bias is not None else False}"
 
 
 class Sequential(Module):

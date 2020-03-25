@@ -36,17 +36,19 @@ class SGD(Optimizer):
     .. math:
         \text{updated_param}_{i} = \text{param}_{i} - \text{learning_rate} \times \text{gradient_param}_{i}
     """
-    def __init__(self, module, lr=0.01):
-        super().__init__(module)
+    def __init__(self, parameters, lr=0.01):
+        super().__init__(parameters)
         self.lr = lr
 
-    def step(self, module):
-        for parameter in module.parameters():
+    def step(self):
+        for parameter in self.parameters:
             parameter -= parameter.grad * self.lr
 
-    # def step(self):
-    #     for module in self.module.modules():
-    #         for key in module._params:
-    #             module._params[key] = module._params[key] - self.lr * module._grads[key]
-
+# class SGD:
+#     def __init__(self, lr: float = 0.01) -> None:
+#         self.lr = lr
+#
+#     def step(self, module) -> None:
+#         for parameter in module.parameters():
+#             parameter -= parameter.grad * self.lr
 
