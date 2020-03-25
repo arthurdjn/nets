@@ -55,7 +55,7 @@ You will find some tutorials and application on how to get started or build a si
 **NETS** provides a basic neural network structure so you can create your own with numpy. You will need to
 wrap your arrays in a ``Tensor`` class to keep track of the gradients.
 
-![NETS](img/xor_classification.png)
+![NETS](img/xor.gif)
 
 ## Building a model
 
