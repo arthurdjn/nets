@@ -9,8 +9,7 @@ If you don't specify it, **NETS** will uses ``autograd`` functionality to comput
 
 from abc import ABC, abstractmethod
 import inspect
-from nets.nn.utils import info_layer
-from nets import Tensor, Parameter
+from nets import Parameter
 
 
 class Module(ABC):
@@ -18,8 +17,7 @@ class Module(ABC):
     Abstract Module architecture. All models used to transform tensors should extends from this class to benefits
     ``forward`` and ``backward`` propagation rules.
     """
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         self.training = True
         self._modules = {}
         self._params = {}
@@ -27,7 +25,7 @@ class Module(ABC):
         self._cache = {}
 
     @abstractmethod
-    def forward(self, *args, **kwargs):
+    def forward(self, *inputs):
         """One forward step. Gradients and outputs should be saved in the ``_cache`` when training, to be able to
         perform the backward pass.
         """
@@ -46,6 +44,11 @@ class Module(ABC):
         self.training = False
 
     def add(self, *modules):
+        """Add modules.
+
+        Args:
+            modules (Module): modules to add
+        """
         for module in modules:
             idx = len(self._modules)
             name = f"{idx}"
@@ -53,6 +56,7 @@ class Module(ABC):
             self._modules[name] = module
 
     def parameters(self):
+        """Iterator through all parameters"""
         for name, value in inspect.getmembers(self):
             if isinstance(value, Parameter):
                 yield value
@@ -60,17 +64,21 @@ class Module(ABC):
                 yield from value.parameters()
 
     def modules(self):
-        return list(self._modules.values())
+        """Iterator through all gradients"""
+        yield from self._modules.values()
 
     def cache(self):
+        """Iterator through all cache dict"""
         for module in self.modules():
             yield module._cache
 
     def gradients(self):
+        """Iterator through all gradients"""
         for module in self.modules():
             yield module._grads
 
     def zero_grad(self):
+        """Zero grad all parameters within a module"""
         for parameter in self.parameters():
             parameter.zero_grad()
 
@@ -78,7 +86,7 @@ class Module(ABC):
         """Quick access to get the name of a module.
 
         Returns:
-            name (string): module's name
+            string: module's name
         """
         return self.__class__.__name__
 
@@ -87,7 +95,7 @@ class Module(ABC):
         This method should be unique for each modules.
 
         Returns:
-            repr (string): the representation of one module.
+            string: the representation of one module.
         """
         return ""
 
@@ -95,6 +103,7 @@ class Module(ABC):
         return self.forward(*inputs)
 
     def __repr__(self):
+        # Representation similar to PyTorch
         string = f"{self.get_name()}("
         tab = "   "
         for key, module in self._modules.items():

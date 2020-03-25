@@ -37,9 +37,10 @@ class Linear(Module):
         r"""Initialize the parameters dictionary.
         For Dense Neural Module, the parameters are either weights or biases. They are saved in the dictionary
         `_params` with the following keys: weight matrix ``w``, bias vector ``b``.
-        The initialization can be changed with ``mode`` parameter, between the default uniform :math:`\mathcal{U}`
-        initialization or :math:`\text{He et al. \mathcal{N}(0, \frac{1}{input_dim}}`.
+        The initialization can be changed with ``mode`` parameter, between the default uniform :math:`\mathcal{U}(0, 1)`
+        initialization or use :math:`\text{He et al.}  \quad \mathcal{N} (0, \frac{1}{input_dim})`.
         """
+        print('Deprecated.')
         # if mode == 'uniform':
         #     mu = 0
         #     var = 2 / self.output_dim

@@ -12,10 +12,10 @@ and an autograd system (you can switch to vanilla gradient update too).
 **NETS** is a vanilla Deep Learning framework, made using only **numpy**.
 This project was first introduced as an assignment I made at the 
 [University of Oslo](https://www.uio.no/studier/emner/matnat/ifi/IN5400/), which is similar to the second
-assignment from [Stanford University](http://cs231n.stanford.edu/syllabus.html).
+assignment from [Stanford University](http://cs231n.stanford.edu/syllabus.html) if you are curious.
 
 However, this project was rebuild to make it entirely *object-oriented like*.
-Moreover, the back-propagation and update rules where changed, using the **autograd** system.
+In addition, the back-propagation and update rules where changed, using the **autograd** system.
 **NETS** was highly inspired from [PyTorch](https://pytorch.org/) and [TensorFlow](https://www.tensorflow.org/)
 
 ### Requirements
@@ -108,3 +108,32 @@ Model(
 ````
 
 Again, this is really similar to what **PyTorch** offers.
+
+# Tutorials
+
+* 1 - [Getting Started with NETS](https://github.com/arthurdjn/nets/blob/master/Getting%20Started%20with%20NETS.ipynb) [![Open In Colab](https://colab.research.google.com/github/arthurdjn/nets/blob/master/Getting%20Started%20with%20NETS.ipynb)
+
+    This tutorial highlights the main part and modules of **NETS**.
+
+* 2 - [Build an Autograd System with NumPy]()
+
+    To be released
+    
+* 3 - [Build a Deep Learning Library From Scratch]()
+
+    To be released
+    
+* 4 - [Build a CNN with NumPy]()
+
+    To be released
+
+# References
+
+Here is a list of tutorials and lectures/assignment that helped to develop **NETS**
+
+- [PyTorch documentation](https://pytorch.org)
+- [PyTorch autograd tutorial](https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html)
+- [Joel Grus autograd tutorial](https://github.com/joelgrus/autograd/tree/part06)
+- [Joel Grus autograd live coding](https://www.youtube.com/watch?v=RxmBukb-Om4)
+- [Stanford University cs231n 2nd assignment](http://cs231n.github.io/)
+- [University of Oslo in5400 1st assignment](https://www.uio.no/studier/emner/matnat/ifi/IN5400/)

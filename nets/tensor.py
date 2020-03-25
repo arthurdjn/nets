@@ -23,15 +23,18 @@ def ensure_tensor(tensorable):
         return Tensor(tensorable)
 
 
-class Tensor:
+class Tensor(object):
     """A Tensor is a multi dimensional array that track and record previous gradients, creating a dynamic
     computational graph.
     """
+
     def __init__(self, data, requires_grad=False, hooks=None):
         self._data = ensure_array(data)
         self.requires_grad = requires_grad
         self._hooks = hooks or []
         self._shape = self._data.shape
+        self.ndim = self._data.ndim
+        self.size = self._data.size
         self.grad = None
 
         if self.requires_grad:
@@ -56,10 +59,44 @@ class Tensor:
         raise AttributeError(
             'cannot change the shape of a tensor manually. Please create a new tensor or set a new data instead')
 
+    @property
+    def T(self):
+        return nets.transpose(self)
+
     def zero_grad(self):
         self.grad = Tensor(np.zeros_like(self.data, dtype=np.float64))
 
-    def __repr__(self) -> str:
+    def backward(self, grad=None):
+        assert self.requires_grad, "called backward on non-requires-grad tensor"
+
+        if grad is None:
+            if self.shape == ():
+                grad = Tensor(1.0)
+            else:
+                raise RuntimeError("grad must be specified for non-0-tensor")
+
+        self.grad.data = self.grad.data + grad.data  # type: ignore
+
+        for hook in self._hooks:
+            backward_grad = hook.grad_fn(grad.data)
+            hook.tensor.backward(Tensor(backward_grad))
+
+    def item(self):
+        return self.data.item()
+
+    def tolist(self):
+        return self.data.tolist()
+
+    def numpy(self):
+        return self.data
+
+    def sum(self):
+        return nets.sum(self)
+
+    def transpose(self):
+        return nets.transpose(self)
+
+    def __repr__(self):
         string_data = '\n       '.join(str(self.data).split('\n'))
         return f"tensor({string_data}, requires_grad={self.requires_grad})"
 
@@ -107,34 +144,3 @@ class Tensor:
 
     def __getitem__(self, indices):
         return nets.slice(self, indices)
-
-    def item(self):
-        return self.data.item()
-
-    def tolist(self):
-        return self.data.tolist()
-
-    def backward(self, grad = None):
-        assert self.requires_grad, "called backward on non-requires-grad tensor"
-
-        if grad is None:
-            if self.shape == ():
-                grad = Tensor(1.0)
-            else:
-                raise RuntimeError("grad must be specified for non-0-tensor")
-
-        self.grad.data = self.grad.data + grad.data  # type: ignore
-
-        for hook in self._hooks:
-            backward_grad = hook.grad_fn(grad.data)
-            hook.tensor.backward(Tensor(backward_grad))
-
-    def sum(self):
-        return nets.sum(self)
-
-    def transpose(self):
-        return nets.transpose(self)
-
-    @property
-    def T(self):
-        return nets.transpose(self)
