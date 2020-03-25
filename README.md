@@ -111,12 +111,9 @@ Again, this is really similar to what **PyTorch** offers.
 
 # Tutorials
 
-* 1 - [Getting Started with NETS](https://github.com/arthurdjn/nets/blob/master/Getting%20Started%20with%20NETS.ipynb) ![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)((https://colab.research.google.com/github/arthurdjn/nets/blob/master/Getting%20Started%20with%20NETS.ipynb)
+* 1 - [Getting Started with NETS](https://github.com/arthurdjn/nets/blob/master/Getting%20Started%20with%20NETS.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/arthurdjn/nets/blob/master/Getting%20Started%20with%20NETS.ipynb)
 
     This tutorial highlights the main part and modules of **NETS**.
-
-* 1 - [Simple Sentiment Analysis](https://github.com/bentrevett/pytorch-sentiment-analysis/blob/master/1%20-%20Simple%20Sentiment%20Analysis.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/bentrevett/pytorch-sentiment-analysis/blob/master/1%20-%20Simple%20Sentiment%20Analysis.ipynb)
-
 
 * 2 - [Build an Autograd System with NumPy]()
 
