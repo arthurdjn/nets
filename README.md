@@ -111,7 +111,7 @@ Again, this is really similar to what **PyTorch** offers.
 
 # Tutorials
 
-* 1 - [Getting Started with NETS](https://github.com/arthurdjn/nets/blob/master/Getting%20Started%20with%20NETS.ipynb) [![Open In Colab](https://colab.research.google.com/github/arthurdjn/nets/blob/master/Getting%20Started%20with%20NETS.ipynb)
+* 1 - [Getting Started with NETS](https://github.com/arthurdjn/nets/blob/master/Getting%20Started%20with%20NETS.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]((https://colab.research.google.com/github/arthurdjn/nets/blob/master/Getting%20Started%20with%20NETS.ipynb)
 
     This tutorial highlights the main part and modules of **NETS**.
 
