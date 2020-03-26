@@ -2,12 +2,11 @@
 Defines tensors for deep learning application. A tensor is multi-dimensional array, similar to NumPy arrays.
 """
 
-from typing import List, NamedTuple, Callable, Optional, Union
 import numpy as np
 import nets
 
 
-def ensure_array(arrayable):
+def to_array(arrayable):
     if isinstance(arrayable, np.ndarray):
         return arrayable
     elif isinstance(arrayable, Tensor):
@@ -16,7 +15,7 @@ def ensure_array(arrayable):
         return np.array(arrayable)
 
 
-def ensure_tensor(tensorable):
+def to_tensor(tensorable):
     if isinstance(tensorable, Tensor):
         return tensorable
     else:
@@ -29,7 +28,7 @@ class Tensor(object):
     """
 
     def __init__(self, data, requires_grad=False, hooks=None):
-        self._data = ensure_array(data)
+        self._data = to_array(data)
         self.requires_grad = requires_grad
         self._hooks = hooks or []
         self._shape = self._data.shape
@@ -90,57 +89,87 @@ class Tensor(object):
     def numpy(self):
         return self.data
 
-    def sum(self):
-        return nets.sum(self)
+    def sum(self, axis=None):
+        return nets.sum(self, axis)
 
     def transpose(self):
         return nets.transpose(self)
 
     def __repr__(self):
-        string_data = '\n       '.join(str(self.data).split('\n'))
-        return f"tensor({string_data}, requires_grad={self.requires_grad})"
+        string_data = np.array2string(self.data, prefix="       ",
+                                      precision=4)
+        requires_grad = "" if not self.requires_grad else f", requires_grad={self.requires_grad}"
+        return f"tensor({string_data}{requires_grad})"
+
+    def __len__(self):
+        return len(self.data)
+
+    def __gt__(self, other):
+        return nets.gt(self, other)
+
+    def __ge__(self, other):
+        return nets.ge(self, other)
+
+    def __lt__(self, other):
+        return nets.lt(self, other)
+
+    def __le__(self, other):
+        return nets.le(self, other)
+
+    def __eq__(self, other):
+        return nets.eq(self, other)
+
+    def __ne__(self, other):
+        return nets.ne(self, other)
 
     def __add__(self, other):
         return nets.add(self, other)
 
     def __radd__(self, other):
-        return nets.add(self, other)
+        return nets.add(other, self)
 
     def __iadd__(self, other):
-        self.data = self.data + other.data
+        self.data = self.data + nets.to_tensor(other).data
         return self
+
+    def __neg__(self):
+        return nets.neg(self)
+
+    def __sub__(self, other):
+        return nets.sub(self, other)
+
+    def __rsub__(self, other):
+        return nets.sub(other, self)
 
     def __isub__(self, other):
-        self.data = self.data - other.data
-        return self
-
-    def __imul__(self, other):
-        self.data = self.data * other.data
+        self.data = self.data - nets.to_tensor(other).data
         return self
 
     def __mul__(self, other):
         return nets.multiply(self, other)
 
     def __rmul__(self, other):
-        return nets.multiply(self, other)
+        return nets.multiply(other, self)
+
+    def __imul__(self, other):
+        self.data = self.data * nets.to_tensor(other).data
+        return self
 
     def __pow__(self, power, modulo=None):
         return nets.pow(self, power)
 
     def __truediv__(self, other):
-        return nets.divide(self, other)
+        return nets.div(self, other)
+
+    def __rtruediv__(self, other):
+        return nets.div(other, self)
+
+    def __itruediv__(self, other):
+        self.data = self.data / nets.to_tensor(other).data
+        return self
 
     def __matmul__(self, other):
         return nets.dot(self, other)
-
-    def __neg__(self):
-        return nets.neg(self)
-
-    def __sub__(self, other):
-        return nets.subtract(self, other)
-
-    def __rsub__(self, other):
-        return nets.subtract(self, other)
 
     def __getitem__(self, indices):
         return nets.slice(self, indices)

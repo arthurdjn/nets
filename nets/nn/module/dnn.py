@@ -1,5 +1,5 @@
 import numpy as np
-from nets.nn.module import Module
+from .module import Module
 from nets.nn.activation import *
 
 

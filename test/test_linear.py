@@ -1,8 +1,7 @@
 import numpy as np
-from nets.nn import DNN, ReLU, Softmax, Affine
-from nets.nn.linear import Linear, Sequential
+from nets.nn import DNN, ReLU, Affine
+from nets.nn.module.linear import Linear, Sequential
 from nets.optim import SGD
-from nets.nn import CrossEntropyLoss
 from nets.utils import one_hot
 
 

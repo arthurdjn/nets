@@ -42,7 +42,7 @@ Usage:
 """
 
 
-from nets.functional import *
+from nets.autograd.functions import *
 from nets.nn.module import Module
 
 

@@ -3,7 +3,7 @@ Linear layers are widely used either for Dense Neural Module or Convolutional Ne
 popular. The architecture is made of two sets of ``neurons`` aka ``perceptrons``, all connected with weights and biases.
 """
 
-from nets.nn.module import Module
+from .module import Module
 from nets.nn.activation import *
 from nets import Parameter
 

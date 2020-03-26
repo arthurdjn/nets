@@ -1,12 +1,18 @@
 r"""
-Defines nets.Tensor operations.
+Defines basic operations between two tensors, like addition, subtraction, dot product etc.
 """
+
 import numpy as np
 import nets
 from .hook import Hook
+from ._utils import _reshape_keepdims, _slice_keepdims
 
 
-def sum(t):
+def _reshape(idx):
+    return
+
+
+def sum(t, axis=None, keepdims=False):
     r"""Compute the sum of all elements in a tensor, and update the gradients and hooks.
 
     .. math::
@@ -15,11 +21,12 @@ def sum(t):
 
     Args:
         t (Tensor): tensor to get the sum from
+        axis (int): axis to sum
 
     Returns:
-        Tensor: 0-dimensional tensor.
+        Tensor: summed tensor
     """
-    data = t.data.sum()
+    data = t.data.sum(axis=axis, keepdims=keepdims)
     requires_grad = t.requires_grad
     hooks = []
     # Update the hooks and gradients
@@ -28,10 +35,13 @@ def sum(t):
             r"""Update the gradient for the sum operation.
 
             Shape:
-                - inputs (np.ndarray): gradient with shape ()
+                - inputs (np.ndarray): upstream gradient
                 - outputs (np.ndarray): gradient with shape the same shape as inputs data :math:`T`.
             """
-            return grad * np.ones_like(t.data)
+            # We need to keep the information on which axis the sum was made
+            # We reshape the gradient in the same axis for back-propagation
+            data_keepdims = t.data.sum(axis=axis, keepdims=True)
+            return grad.reshape(data_keepdims.shape) + np.zeros_like(t.data)
 
         hooks.append(Hook(t, grad_fn))
 
@@ -52,8 +62,8 @@ def add(t1, t2):
     Returns:
         Tensor: the sum of two Tensor-like object
     """
-    t1 = nets.ensure_tensor(t1)
-    t2 = nets.ensure_tensor(t2)
+    t1 = nets.to_tensor(t1)
+    t2 = nets.to_tensor(t2)
     data = t1.data + t2.data
     requires_grad = t1.requires_grad or t2.requires_grad
     hooks = []
@@ -115,7 +125,7 @@ def neg(t):
     Returns:
         Tensor
     """
-    t = nets.ensure_tensor(t)
+    t = nets.to_tensor(t)
     data = -t.data
     requires_grad = t.requires_grad
     hooks = []
@@ -126,7 +136,7 @@ def neg(t):
     return nets.Tensor(data, requires_grad, hooks)
 
 
-def subtract(t1, t2):
+def sub(t1, t2):
     r"""Subtract two tensor-like object
 
     .. math::
@@ -157,8 +167,8 @@ def multiply(t1, t2):
     Returns:
         Tensor
     """
-    t1 = nets.ensure_tensor(t1)
-    t2 = nets.ensure_tensor(t2)
+    t1 = nets.to_tensor(t1)
+    t2 = nets.to_tensor(t2)
     data = t1.data * t2.data
     requires_grad = t1.requires_grad or t2.requires_grad
     hooks = []
@@ -221,7 +231,7 @@ def inverse(t):
     Returns:
         Tensor
     """
-    t = nets.ensure_tensor(t)
+    t = nets.to_tensor(t)
     requires_grad = t.requires_grad
     hooks = []
 
@@ -240,7 +250,7 @@ def inverse(t):
     return nets.Tensor(1 / t.data, requires_grad, hooks)
 
 
-def divide(t1, t2):
+def div(t1, t2):
     r"""Divide two tensor-like object.
 
     .. math::
@@ -254,44 +264,9 @@ def divide(t1, t2):
     Returns:
         Tensor
     """
-    t1 = nets.ensure_tensor(t1)
-    t2 = nets.ensure_tensor(t2)
+    t1 = nets.to_tensor(t1)
+    t2 = nets.to_tensor(t2)
     return multiply(t1, inverse(t2))
-
-
-def pow(t, power):
-    r"""Power a tensor-like object.
-
-    .. math::
-
-        T_{out} = T^2
-
-    Args:
-        t (Tensor like): reference tensor
-        power (int): power to elevate a tensor
-
-    Returns:
-        Tensor
-    """
-    assert type(power) == int, "unsupported type {} for power. Currently supported type: int".format(type(power))
-
-    data = t.data ** power
-    requires_grad = t.requires_grad
-    hooks = []
-    # Update the gradient
-    if requires_grad:
-        def grad_fn(grad):
-            r"""Update the gradient for the pow operation.
-            
-            Shape:
-                - inputs (np.ndarray): upstream gradient.
-                - outputs (np.ndarray): downstream gradient.
-            """
-            return power * t.data ** (power - 1) * grad
-
-        hooks.append(Hook(t, grad_fn))
-
-    return nets.Tensor(data, requires_grad, hooks)
 
 
 def dot(t1, t2):
@@ -343,33 +318,132 @@ def slice(t, idxs):
     hooks = []
     if requires_grad:
         def grad_fn(grad):
-            bigger_grad = np.zeros_like(data)
-            bigger_grad[idxs] = grad
+            bigger_grad = np.zeros_like(t.data)
+            if grad.shape != bigger_grad.shape:
+                bigger_grad[idxs] = grad
+            else:
+                bigger_grad = grad
             return bigger_grad
-
         hooks.append(Hook(t, grad_fn))
 
     return nets.Tensor(data, requires_grad, hooks)
 
 
-def transpose(t):
-    r"""Transpose a tensor object.
+def gt(t, other):
+    r"""Return a boolean tensor for *greater than* condition.
 
     .. math::
 
-        T_{out} = (t_{i, j}^{[out]})_{i, j} \quad where \quad t_{i, j}^{[out]} = t_{j ,i}
+        condition = T > other
 
     Args:
-        t (Tensor):
+        t (Tensor): tensor to compare
+        other (Tensor like): object to compare the tensor
 
     Returns:
         Tensor
     """
-    data = t.data.T
-    requires_grad = t.requires_grad
-    if requires_grad:
-        hooks = [Hook(t, lambda x: x.T)]
-    else:
-        hooks = []
+    t = nets.to_array(t)
+    other = nets.to_array(other)
+    cond = t > other
+    return nets.to_tensor(cond)
 
-    return nets.Tensor(data, requires_grad, hooks)
+
+def ge(t, other):
+    r"""Return a boolean tensor for *Greater than* condition.
+
+    .. math::
+
+        condition = T \ge other
+
+    Args:
+        t (Tensor): tensor to compare
+        other (Tensor like): object to compare the tensor
+
+    Returns:
+        Tensor
+    """
+    t = nets.to_array(t)
+    other = nets.to_array(other)
+    cond = t >= other
+    return nets.to_tensor(cond)
+
+
+def lt(t, other):
+    r"""Return a boolean tensor for *lower than* condition.
+
+    .. math::
+
+        condition = T < other
+
+    Args:
+        t (Tensor): tensor to compare
+        other (Tensor like): object to compare the tensor
+
+    Returns:
+        Tensor
+    """
+    t = nets.to_array(t)
+    other = nets.to_array(other)
+    cond = t < other
+    return nets.to_tensor(cond)
+
+
+def le(t, other):
+    r"""Return a boolean tensor for *Greater than* condition.
+
+    .. math::
+
+        condition = T \le other
+
+    Args:
+        t (Tensor): tensor to compare
+        other (Tensor like): object to compare the tensor
+
+    Returns:
+        Tensor
+    """
+    t = nets.to_array(t)
+    other = nets.to_array(other)
+    cond = t <= other
+    return nets.to_tensor(cond)
+
+
+def eq(t, other):
+    r"""Return a boolean tensor for *Greater than* condition.
+
+    .. math::
+
+        condition = T == other
+
+    Args:
+        t (Tensor): tensor to compare
+        other (Tensor like): object to compare the tensor
+
+    Returns:
+        Tensor
+    """
+    t = nets.to_array(t)
+    other = nets.to_array(other)
+    cond = t == other
+    return nets.to_tensor(cond)
+
+
+def ne(t, other):
+    r"""Return a boolean tensor for *Greater than* condition.
+
+    .. math::
+
+        condition = T not other
+
+    Args:
+        t (Tensor): tensor to compare
+        other (Tensor like): object to compare the tensor
+
+    Returns:
+        Tensor
+    """
+    t = nets.to_array(t)
+    other = nets.to_array(other)
+    cond = not t == other
+    return nets.to_tensor(cond)
