@@ -99,9 +99,6 @@ class Module(ABC):
         """
         return ""
 
-    def __call__(self, *inputs):
-        return self.forward(*inputs)
-
     def __repr__(self):
         # Representation similar to PyTorch
         string = f"{self.get_name()}("
@@ -109,6 +106,9 @@ class Module(ABC):
         for key, module in self._modules.items():
             string += f"\n{tab}({key}): {module.get_name()}({module.inner_repr()})"
         return f'{string}\n)'
+
+    def __call__(self, *inputs):
+        return self.forward(*inputs)
 
     def __setattr__(self, key, value):
         # First initialize the attribute we want to add

@@ -133,3 +133,5 @@ dmypy.json
 sphinx_docs/
 .data
 .vector_cache
+
+*test.ipynb

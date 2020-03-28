@@ -1,5 +1,5 @@
 """
-Defines tensors for deep learning application. A tensor is multi-dimensional array, similar to NumPy arrays.
+Defines tensors for deep learning application. A tensor is multi-dimensional array, similar to ``numpy`` arrays.
 """
 
 import numpy as np
@@ -7,6 +7,14 @@ import nets
 
 
 def to_array(arrayable):
+    """Convert an object to a ``numpy.ndarray`` if possible.
+
+    Args:
+        arrayable: object to convert
+
+    Returns:
+        numpy.ndarray
+    """
     if isinstance(arrayable, np.ndarray):
         return arrayable
     elif isinstance(arrayable, Tensor):
@@ -16,6 +24,14 @@ def to_array(arrayable):
 
 
 def to_tensor(tensorable):
+    """Convert an object to a ``Tensor`` if possible.
+
+    Args:
+        tensorable: object to convert
+
+    Returns:
+        Tensor
+    """
     if isinstance(tensorable, Tensor):
         return tensorable
     else:
@@ -27,45 +43,104 @@ class Tensor(object):
     computational graph.
     """
 
+    # Objects instance are heavy-weight in Python.
+    # Setting slots free memory, and does not keep built-in functions (__builtin__ things)
+    __slots__ = '_data', 'requires_grad', '_hooks', 'grad', '_id'
+
+    # A global parameter to track how many Tensor have been instantiate.
+    # This is mainly for debugging and visualization
+    _COUNTER = 0
+
     def __init__(self, data, requires_grad=False, hooks=None):
         self._data = to_array(data)
         self.requires_grad = requires_grad
         self._hooks = hooks or []
-        self._shape = self._data.shape
-        self.ndim = self._data.ndim
-        self.size = self._data.size
         self.grad = None
+        # Update the tracking
+        self._id = Tensor._COUNTER
+        Tensor._COUNTER += 1
 
         if self.requires_grad:
             self.zero_grad()
 
     @property
-    def data(self) -> np.ndarray:
+    def data(self):
         return self._data
 
     @data.setter
     def data(self, new_data):
         self._data = new_data
         # Setting the data manually means we invalidate the gradient.
-        self.grad = None
+        self.detach()
 
     @property
     def shape(self):
-        return self._shape
+        return self._data.shape
 
-    @shape.setter
-    def shape(self, new_shape):
-        raise AttributeError(
-            'cannot change the shape of a tensor manually. Please create a new tensor or set a new data instead')
+    @property
+    def size(self):
+        return self._data.size
+
+    @property
+    def ndim(self):
+        return self._data.ndim
+
+    @property
+    def dtype(self):
+        return self._data.dtype
+
+    @dtype.setter
+    def dtype(self, new_dtype):
+        self._data = self._data.astype(new_dtype)
+        self.detach()
+
+    @property
+    def id(self):
+        return self._id
 
     @property
     def T(self):
         return nets.transpose(self)
 
+    def detach(self):
+        r"""Unlink the ``Tensor`` to the computational graph.
+        By calling this method, the attribute ``_hooks`` and ``grad`` are set to their default values,
+        ``None``.
+
+        Returns:
+            None
+        """
+        self.grad = None
+        self._hooks = None
+
     def zero_grad(self):
+        r"""Set to a zero ``Tensor`` the gradient. This is call when initializing a ``Tensor`` that requires gradient
+        tracking, or re-initialize parameters's gradient after a training loop as they accumulate on each other.
+
+        Returns:
+            None
+        """
         self.grad = Tensor(np.zeros_like(self.data, dtype=np.float64))
 
     def backward(self, grad=None):
+        r"""Compute a single backward pass on all ``Tensor`` linked to this one.
+        The ``Tensor`` depending to this top-level ``Tensor``are stored in the ``_hooks`` attribute.
+        The backward pass compute a gradient back-propagation on all ``Tensor`` registered in ``_hooks``.
+        The backward pass gradient in ``grad`` attribute (and add upstream gradient if the ``Tensor``
+        is used multiple times).
+
+        Args:
+            grad (Tensor): upstream gradient. Default is None, and will be set to ``Tensor(1.0)``, a 0-dimensional
+                ``Tensor``.
+
+        Returns:
+            None
+
+        .. note::
+
+            To be able to back-propagate, the top-level ``Tensor`` must have ``requires_grad`` set to ``True``
+            to propagate the gradient.
+        """
         assert self.requires_grad, "called backward on non-requires-grad tensor"
 
         if grad is None:
@@ -74,32 +149,92 @@ class Tensor(object):
             else:
                 raise RuntimeError("grad must be specified for non-0-tensor")
 
+        # Update the gradient
+        # NOTE: the gradients accumulate !
         self.grad.data = self.grad.data + grad.data  # type: ignore
 
-        for hook in self._hooks:
-            backward_grad = hook.grad_fn(grad.data)
-            hook.tensor.backward(Tensor(backward_grad))
+        # Back-propagation in all dependencies
+        hooks = self._hooks
+        if hooks is not None:
+            for hook in self._hooks:
+                # Compute the gradient wrt the operation
+                backward_grad = hook.grad_fn(grad.data)
+                # Back-propagate in the tensor used in this operation
+                hook.tensor.backward(Tensor(backward_grad))
+
+        # TODO: handle properly nodes and leaf from different hooks
+        # TODO: maybe add Variable class / is_leaf attributes
+        # TODO: and counter to skip gradients that don't need to be set
 
     def item(self):
+        r"""
+        Get the item (float, int etc.) of a 0-dimensional ``Tensor``. It will detach the tensor from the computational
+        graph by setting ``_hooks = []`` and ``grad = None`` to free memory and send this graph to the garbage collector.
+
+        Returns:
+            Any
+        """
+        self.detach()
         return self.data.item()
 
     def tolist(self):
+        r"""Convert the ``Tensor`` data to a list (of list eventually).
+
+        Returns:
+            list
+        """
+        # self.detach()
         return self.data.tolist()
 
     def numpy(self):
+        r"""Convert the ``Tensor`` data to a ``numpy.ndarray`` object.
+
+        Returns:
+            numpy.ndarray
+        """
+        # self.detach()
         return self.data
 
     def sum(self, axis=None):
+        r"""Sum the data along a given axis. If no axis are specified, all values within the ``Tensor``will be summed.
+
+        Args:
+            axis (int): the index of the axis to sum on.
+
+        Returns:
+            Tensor
+        """
         return nets.sum(self, axis)
 
     def transpose(self):
+        r"""Transpose the ``Tensor``. The operation is not in-place.
+
+        Returns:
+            Tensor
+        """
         return nets.transpose(self)
+
+    def reshape(self, shape):
+        r"""Reshape a ``Tensor`` with a new shape. The transformation is not made in-place.
+
+        .. note::
+
+            The new shape **must** have the same size of the actual shape.
+            If its not the case, the reshape method will raise an error.
+
+        Args:
+            shape (tuple): new shape of the ``Tensor``
+
+        Returns:
+            Tensor
+        """
+        return nets.reshape(self, shape)
 
     def __repr__(self):
         string_data = np.array2string(self.data, prefix="       ",
                                       precision=4)
         requires_grad = "" if not self.requires_grad else f", requires_grad={self.requires_grad}"
-        return f"tensor({string_data}{requires_grad})"
+        return f"Tensor({string_data}{requires_grad})"
 
     def __len__(self):
         return len(self.data)
@@ -173,3 +308,7 @@ class Tensor(object):
 
     def __getitem__(self, indices):
         return nets.slice(self, indices)
+
+    def __setitem__(self, key, value):
+        self._hooks = None
+        self.data[key] = value

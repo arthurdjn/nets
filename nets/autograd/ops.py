@@ -5,11 +5,6 @@ Defines basic operations between two tensors, like addition, subtraction, dot pr
 import numpy as np
 import nets
 from .hook import Hook
-from ._utils import _reshape_keepdims, _slice_keepdims
-
-
-def _reshape(idx):
-    return
 
 
 def sum(t, axis=None, keepdims=False):
@@ -22,6 +17,8 @@ def sum(t, axis=None, keepdims=False):
     Args:
         t (Tensor): tensor to get the sum from
         axis (int): axis to sum
+        keepdims (bool): keep the same dimension in the resulting ``Tensor`` as the input if set to ``True``.
+            Default is ``False``.
 
     Returns:
         Tensor: summed tensor
@@ -38,8 +35,8 @@ def sum(t, axis=None, keepdims=False):
                 - inputs (np.ndarray): upstream gradient
                 - outputs (np.ndarray): gradient with shape the same shape as inputs data :math:`T`.
             """
-            # We need to keep the information on which axis the sum was made
-            # We reshape the gradient in the same axis for back-propagation
+            # We need to keep the information on which axis the sum was made (to be broadcasting compatible)
+            # We always reshape the gradient in the same axis for back-propagation
             data_keepdims = t.data.sum(axis=axis, keepdims=True)
             return grad.reshape(data_keepdims.shape) + np.zeros_like(t.data)
 
@@ -85,7 +82,6 @@ def add(t1, t2):
                 if dim == 1:
                     grad = grad.sum(axis=i, keepdims=True)
             return grad
-
         hooks.append(Hook(t1, grad_fn1))
 
     # Update the hooks and gradients from t2
@@ -106,7 +102,6 @@ def add(t1, t2):
                 if dim == 1:
                     grad = grad.sum(axis=i, keepdims=True)
             return grad
-
         hooks.append(Hook(t2, grad_fn2))
 
     return nets.Tensor(data, requires_grad, hooks)
@@ -169,7 +164,7 @@ def multiply(t1, t2):
     """
     t1 = nets.to_tensor(t1)
     t2 = nets.to_tensor(t2)
-    data = t1.data * t2.data
+    data = np.multiply(t1.data, t2.data)
     requires_grad = t1.requires_grad or t2.requires_grad
     hooks = []
 
@@ -350,7 +345,7 @@ def gt(t, other):
 
 
 def ge(t, other):
-    r"""Return a boolean tensor for *Greater than* condition.
+    r"""Return a boolean tensor for *greater or equal* condition.
 
     .. math::
 
@@ -390,7 +385,7 @@ def lt(t, other):
 
 
 def le(t, other):
-    r"""Return a boolean tensor for *Greater than* condition.
+    r"""Return a boolean tensor for *lower or equal* condition.
 
     .. math::
 
@@ -410,7 +405,7 @@ def le(t, other):
 
 
 def eq(t, other):
-    r"""Return a boolean tensor for *Greater than* condition.
+    r"""Return a boolean tensor for *equal* condition.
 
     .. math::
 
@@ -430,7 +425,7 @@ def eq(t, other):
 
 
 def ne(t, other):
-    r"""Return a boolean tensor for *Greater than* condition.
+    r"""Return a boolean tensor for *not equal* condition.
 
     .. math::
 

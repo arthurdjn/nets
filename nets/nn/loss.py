@@ -55,7 +55,7 @@ class MSE(Loss):
     """
 
     def __init__(self):
-        super(MSE, self).__init__()
+        super().__init__()
 
     def forward(self, predictions, labels):
         assert labels.shape == predictions.shape, \
@@ -75,21 +75,16 @@ class CrossEntropyLoss(Loss):
     .. math::
 
         \text{CrossEntropyLoss} = - \frac{1}{N} \sum_{i=1}^{c}labels_{i}\log(pred_{i})
-
     """
 
     def __init__(self):
-        super(CrossEntropyLoss, self).__init__()
+        super().__init__()
 
     def forward(self, predictions, labels):
         assert labels.dtype == int, "unsupported labels type {} for cross entropy loss".format(predictions.dtype)
-        num_classes, batch_size = predictions.shape
-        predictions = softmax(predictions)
-        cost = - 1 / batch_size * np.sum(np.multiply(np.log(predictions), labels))
-        # Number of correct answers
-        # predicted_classes = np.argmax(outputs, axis=0)
-        # predicted_classes = one_hot(predicted_classes, num_classes)
-        # num_correct = np.sum(predicted_classes * labels)
+        batch_size, _ = predictions.shape
+        predictions = nets.softmax(predictions, axis=1)
+        cost = - 1 / batch_size * nets.sum(nets.log(predictions) * labels)
         return cost
 
     def backward(self, predictions, labels):

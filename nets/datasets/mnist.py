@@ -1,12 +1,15 @@
+r"""
+Defines and pre-process the MNIST dataset. The data will be converted into ``Tensor`` objects.
+"""
+
+import gzip
 import os
-import pickle
 import numpy as np
-from .dataset import Dataset
-from nets.data.examples import Examples
-from nets.data import Field
+import nets
+from nets.data.dataset import Dataset
 
 
-class CIFAR10(Dataset):
+class MNIST(Dataset):
     """
     Loads training, validation, and test partitions of the mnist dataset
     (http://yann.lecun.com/exdb/mnist/). If the data is not already contained in data_dir, it will
@@ -31,83 +34,51 @@ class CIFAR10(Dataset):
     """
 
     urls = ['http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz',
-            'http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz']
+            'http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz',
+            'http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz',
+            'http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz',]
     name = 'mnist-data-py'
     dirname = 'mnist'
 
-    # def _load_data(filename, data_dir, header_size):
-    #     """Load mnist images or labels. This tries to download the data if it is not found.
-    #
-    #     Args:
-    #         filename: Filename of the dataset. Is appended to the root url and used to download the
-    #                   data if it is not already downloaded.
-    #         data_dir: String. Destination directory.
-    #         header_size: uint8. Size of the header in bytes, which is 8 for labels and 16 for
-    #                      images. See the mnist webpage for more info.
-    #     Returns:
-    #         data: uint8 numpy array
-    #     """
-    #     url = "http://yann.lecun.com/exdb/mnist/" + filename
-    #     data_filepath = maybe_download(url, data_dir)
-    #     with gzip.open(data_filepath, 'rb') as fil:
-    #         data = np.frombuffer(fil.read(), np.uint8, offset=header_size)
-    #     return np.asarray(data, dtype=np.uint8)
-    #
-    # # print("Loading MNIST data from ", data_dir)
-    # X_train = _load_data('train-images-idx3-ubyte.gz', data_dir, 16).reshape((-1, 784)).T
-    # Y_train = _load_data('train-labels-idx1-ubyte.gz', data_dir, 8)
-    # X_test = _load_data('t10k-images-idx3-ubyte.gz', data_dir, 16).reshape((-1, 784)).T
-    # Y_test = _load_data('t10k-labels-idx1-ubyte.gz', data_dir, 8)
+    def __init__(self, path_data, path_label, transform=None):
+        data = self._load_mnist(path_data, header_size=16).reshape((-1, 28, 28))
+        if transform is not None:
+            data = transform(data)
+        self.data = nets.Tensor(data)
+        self.labels = nets.Tensor(self._load_mnist(path_label, header_size=8))
 
-
-    def __init__(self, filepath, fields=None):
-        if fields is None:
-            fields = [("data", Field()), ("label", Field())]
-        # Unpickle file and fill in data
-        data = None
-        labels = []
-
-        if filepath[-1] == "_":
-            for idx in range(1, 6):
-                filename = filepath + str(idx)
-                with open(filename, 'rb') as f:
-                    data_dict = pickle.load(f, encoding='latin-1')
-                if idx == 1:
-                    data = data_dict['data']
-                else:
-                    data = np.vstack((data, data_dict['data']))
-                labels.extend(data_dict['labels'])
-            labels = np.array(labels)
-        else:
-            with open(filepath, 'rb') as f:
-                test_data_dict = pickle.load(f, encoding='latin-1')
-            data = test_data_dict['data']
-            labels = np.array(test_data_dict['labels'])
-
-        values = (data, labels)
-        examples = Examples(values, fields)
-        super(CIFAR10, self).__init__(examples)
+    def _load_mnist(self, path, header_size):
+        with gzip.open(path, 'rb') as f:
+            data = np.frombuffer(f.read(), np.uint8, offset=header_size)
+        return np.asarray(data, dtype=np.uint8)
 
     @classmethod
-    def splits(cls, root='.data', train='data_batch_', test='test_batch', **kwargs):
-        """
-        Loads training, validation, and test partitions of the cifar10 dataset
-        (https://www.cs.toronto.edu/~kriz/cifar.html). If the data is not already contained in
-        ``root`` folder, it will download it.
+    def splits(cls, root='.data', train_data='train-images-idx3-ubyte.gz', train_label='train-labels-idx1-ubyte.gz',
+               test_data='t10k-images-idx3-ubyte.gz', test_label='t10k-labels-idx1-ubyte.gz', **kwargs):
+        r"""
+        Loads training and test partitions of the [mnist dataset](https://www.cs.toronto.edu/~kriz/cifar.html). If
+        the data is not already contained in the ``root`` folder, it will download it.
 
         Args:
-            test:
-            train:
             root (str): relative or absolute path of the dataset.
 
         Returns:
             tuple(Dataset): training and testing datasets
-
         """
-        path = os.path.join(root, cls.dirname, cls.name, 'cifar-10-batches-py')
+        path = os.path.join(root, cls.dirname, cls.name)
         if not os.path.isdir(path):
             path = cls.download(root)
-            path = os.path.join(path, 'cifar-10-batches-py')
-        path_train = os.path.join(path, train)
-        path_test = os.path.join(path, test)
-        return CIFAR10(path_train, **kwargs), CIFAR10(path_test, **kwargs)
+        train_data = os.path.join(path, train_data)
+        train_label = os.path.join(path, train_label)
+        test_data = os.path.join(path, test_data)
+        test_label = os.path.join(path, test_label)
+        return MNIST(train_data, train_label, **kwargs), MNIST(test_data, test_label, **kwargs)
+
+    def __getitem__(self, item):
+        return self.data[item], self.labels[item]
+
+    def __setitem__(self, key, value):
+        self.data[key], self.labels[key] = value
+
+    def __len__(self):
+        return len(self.data)

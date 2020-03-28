@@ -34,3 +34,7 @@ def eye(size, *args, **kwargs):
 def identity(size, *args, **kwargs):
     data = np.identity(size)
     return nets.Tensor(data, *args, **kwargs)
+
+
+def reshape(t, shape):
+    return t.data.reshape(shape)

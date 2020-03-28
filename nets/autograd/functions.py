@@ -194,9 +194,10 @@ def softmax(x, axis=0):
     See :class:`~nets.nn.activation.Softmax` for the activation implementation.
     """
     e = nets.exp(x)
-    t = x - nets.log(nets.sum(e, axis=axis, keepdims=True))
-    s = nets.exp(t)
-    return s
+    s = nets.sum(e, axis=axis, keepdims=True)
+    t = x - nets.log(s)
+    soft = nets.exp(t)
+    return soft
 
 
 def tanh(t):

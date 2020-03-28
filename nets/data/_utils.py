@@ -2,7 +2,9 @@ import requests
 import tarfile
 import zipfile
 import gzip
+import shutil
 import os
+from nets.utils import progress_bar
 
 
 def download_from_url(url, save_path, chunk_size=128):
@@ -17,7 +19,6 @@ def download_from_url(url, save_path, chunk_size=128):
 
     Returns:
         None
-
     """
     response = requests.get(url, stream=True)
     total = response.headers.get('content-length')
@@ -30,23 +31,26 @@ def download_from_url(url, save_path, chunk_size=128):
             for data in response.iter_content(chunk_size=max(int(total / 1000), 1024 * 1024)):
                 downloaded += len(data)
                 f.write(data)
-                percentage = int(100 * downloaded / total)
-                print('\rdownloading... {:3d}% | [{}{}]'.format(percentage, "=" * (percentage // 2),
-                                                                " " * (50 - percentage // 2)), end='')
-    print(" | done !")
+                progress_bar(downloaded, total, "Downloading...")
 
 
 def extract_to_dir(filename, dirpath='.'):
     # Does not create folder twice with the same name
-    name, _ = os.path.splitext(filename)
-    if os.path.basename(name) == os.path.basename(dirpath):
-        dirpath = '.'
+    name, ext = os.path.splitext(filename)
+    # if os.path.basename(name) == os.path.basename(dirpath):
+    #     dirpath = '.'
     # Extract
-    print("extracting...", end="")
+    print(dirpath)
+    print("Extracting...", end="")
     if tarfile.is_tarfile(filename):
         tarfile.open(filename, 'r').extractall(dirpath)
     elif zipfile.is_zipfile(filename):
         zipfile.ZipFile(filename, 'r').extractall(dirpath)
+    elif ext == '.gz':
+        if not os.path.exists(dirpath):
+            os.mkdir(dirpath)
+        shutil.move(filename, os.path.join(dirpath, os.path.basename(filename)))
+        print(f" | NOTE: gzip files are not extracted, and moved to {dirpath}", end="")
     # Return the path where the file was extracted
-    print(" | done !")
+    print(" | Done !")
     return os.path.abspath(dirpath)
