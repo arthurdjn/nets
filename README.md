@@ -21,7 +21,7 @@ packages.
 or **TensorFlow**. Instead, this package was made to understand how all of these libraries work and handle
 forward / backward propagation by making one from scratch.
 As I am going through this *deep* understanding, I found interesting to share 
-as much as possible my work, which I hope will help students or people that want to learn more about this subject.
+as much as possible my work, which I hope will help students or people who want to learn more about this subject.
 
 
 ### Requirements
@@ -135,7 +135,7 @@ Again, this is really similar to what **PyTorch** offers.
 
 # Tutorials
 
-* 1 - [Getting Started with NETS](https://github.com/arthurdjn/nets/blob/master/%0%20-%20Getting%20Started%20with%20NETS.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/arthurdjn/nets/blob/master/%0%20-%20Getting%20Started%20with%20NETS.ipynb)
+* 1 - [Getting Started with NETS](https://github.com/arthurdjn/nets/blob/master/0%20-%20Getting%20Started%20with%20NETS.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/arthurdjn/nets/blob/master/0%20-%20Getting%20Started%20with%20NETS.ipynb)
 
     This tutorial highlights the main part and modules of **NETS**.
 

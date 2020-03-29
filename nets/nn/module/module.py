@@ -7,8 +7,12 @@ When building a custom neural network, your model must inherits from ``Module`` 
 If you don't specify it, **NETS** will uses ``autograd`` functionality to compute all gradients.
 """
 
+from collections import OrderedDict
 from abc import ABC, abstractmethod
 import inspect
+import warnings
+import json
+import pickle
 from nets import Parameter
 
 
@@ -19,10 +23,10 @@ class Module(ABC):
     """
     def __init__(self):
         self.training = True
-        self._modules = {}
-        self._params = {}
-        self._grads = {}
-        self._cache = {}
+        self._modules = OrderedDict()
+        self._params = OrderedDict()
+        self._grads = OrderedDict()
+        self._cache = OrderedDict()
 
     @abstractmethod
     def forward(self, *inputs):
@@ -38,10 +42,14 @@ class Module(ABC):
     def train(self):
         """Set the ``training`` attribute to training mode."""
         self.training = True
+        for param in self.parameters():
+            param.requires_grad = True
 
     def eval(self):
         """Set the ``training`` attribute to evaluation mode."""
         self.training = False
+        for param in self.parameters():
+            param.requires_grad = False
 
     def add(self, *modules):
         """Add modules to the current one.
@@ -81,6 +89,33 @@ class Module(ABC):
         """Zero grad all parameters within a module"""
         for parameter in self.parameters():
             parameter.zero_grad()
+
+    def state_dict(self):
+        r"""Save all parameters in a dictionary."""
+        state = OrderedDict()
+        for i, param in enumerate(self.parameters()):
+            state[f'param{i}'] = param.tolist()
+        return state
+
+    def load_state(self, state_dict):
+        r"""Load parameters from a ``state_dict`` dictionary."""
+        for i, param in self.parameters():
+            data = state_dict[f'param{i}']
+            if param.shape != data.shape:
+                warnings.warn(f"shape from the `state_dict` does not match model's parameter shape. "
+                              f"Got {data.shape}, expected {param.shape}.", UserWarning, stacklevel=2)
+            param.data = Parameter(data=data)
+
+    def save(self, filename='model.pickle'):
+        """Save a model as a PICKLE file."""
+        with open(filename, 'wb') as f:
+            pickle.dump(self, f)
+
+    def save_dict(self, filename='state_dict.json'):
+        """Save the state as a JSON file."""
+        state = self.state_dict()
+        with open(filename, 'w') as f:
+            json.dump(state, f)
 
     def get_name(self):
         """Quick access to get the name of a module.
