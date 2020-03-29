@@ -51,7 +51,7 @@ def progress_bar(current_index, max_index, prefix=None, suffix=None, start_time=
     # Add a timer
     if start_time is not None:
         time_min, time_sec = get_time(start_time, time.time())
-        time_display = " | Time : {0}m {1}s".format(time_min, time_sec)
+        time_display = " | Time: {0}m {1}s".format(time_min, time_sec)
         progress_display += time_display
 
     # Print the progress bar

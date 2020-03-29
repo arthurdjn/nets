@@ -44,7 +44,7 @@ class Module(ABC):
         self.training = False
 
     def add(self, *modules):
-        """Add modules.
+        """Add modules to the current one.
 
         Args:
             modules (Module): modules to add
@@ -103,8 +103,12 @@ class Module(ABC):
         # Representation similar to PyTorch
         string = f"{self.get_name()}("
         tab = "   "
-        for key, module in self._modules.items():
-            string += f"\n{tab}({key}): {module.get_name()}({module.inner_repr()})"
+        modules = self._modules
+        if modules == {}:
+            string += f'\n{tab}(parameters): {self.inner_repr()}'
+        else:
+            for key, module in modules.items():
+                string += f"\n{tab}({key}): {module.get_name()}({module.inner_repr()})"
         return f'{string}\n)'
 
     def __call__(self, *inputs):

@@ -1,4 +1,4 @@
-import numpy as np
+import nets
 
 
 def one_hot(Y, num_classes):
@@ -20,6 +20,6 @@ def one_hot(Y, num_classes):
         Tensor: one hot encoded tensor of shape :math:`(N, c)`
     """
     batch_size = len(Y)
-    Y_tilde = np.zeros((batch_size, num_classes))
-    Y_tilde[np.arange(batch_size), Y] = 1
+    Y_tilde = nets.zeros((batch_size, num_classes))
+    Y_tilde[nets.arange(batch_size), Y] = 1
     return Y_tilde.astype(int)

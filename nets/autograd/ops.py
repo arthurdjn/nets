@@ -298,7 +298,7 @@ def dot(t1, t2):
     return nets.Tensor(data, requires_grad, hooks)
 
 
-def slice(t, idxs):
+def slice(t, indices):
     r"""Slice a tensor from given indices.
 
     Args:
@@ -308,14 +308,17 @@ def slice(t, idxs):
     Returns:
         Tensor
     """
-    data = t.data[idxs]
+    t = nets.to_tensor(t)
+    if isinstance(indices, nets.Tensor):
+        indices = indices.data
+    data = t.data[indices]
     requires_grad = t.requires_grad
     hooks = []
     if requires_grad:
         def grad_fn(grad):
             bigger_grad = np.zeros_like(t.data)
             if grad.shape != bigger_grad.shape:
-                bigger_grad[idxs] = grad
+                bigger_grad[indices] = grad
             else:
                 bigger_grad = grad
             return bigger_grad
@@ -342,6 +345,25 @@ def gt(t, other):
     other = nets.to_array(other)
     cond = t > other
     return nets.to_tensor(cond)
+
+
+def set(t, key, value):
+    if isinstance(key, nets.Tensor):
+        key = key.data
+    elif isinstance(key, tuple):
+        keys = []
+        for k in key:
+            if isinstance(k, nets.Tensor):
+                keys.append(k.data)
+            else:
+                keys.append(k)
+        key = tuple(keys)
+    t.data[key] = nets.to_tensor(value).data
+
+    # Setting a tensor invalidate its gradient
+    t.detach()
+
+    return t
 
 
 def ge(t, other):

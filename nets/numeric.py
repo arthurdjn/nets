@@ -12,8 +12,8 @@ def zeros(shape, *args, **kwargs):
 
 
 def zeros_like(t, *args, **kwargs):
-    data = np.zeros_like(t.numpy())
-    return nets.Tensor(data, *args, **kwargs)
+    data = np.zeros_like(t.data)
+    return nets.Tensor(data, t.requires_grad, *args, **kwargs)
 
 
 def ones(shape, *args, **kwargs):
@@ -22,8 +22,8 @@ def ones(shape, *args, **kwargs):
 
 
 def ones_like(t, *args, **kwargs):
-    data = np.ones_like(t.numpy())
-    return nets.Tensor(data, *args, **kwargs)
+    data = np.ones_like(t.data)
+    return nets.Tensor(data, t.requires_grad, *args, **kwargs)
 
 
 def eye(size, *args, **kwargs):
@@ -36,5 +36,12 @@ def identity(size, *args, **kwargs):
     return nets.Tensor(data, *args, **kwargs)
 
 
-def reshape(t, shape):
-    return t.data.reshape(shape)
+def arange(*args, requires_grad=False):
+    return nets.Tensor(np.arange(*args), requires_grad)
+
+
+def astype(t, new_type):
+    return nets.Tensor(t.data.astype(new_type))
+
+
+

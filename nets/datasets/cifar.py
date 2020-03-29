@@ -42,7 +42,7 @@ class CIFAR10(Dataset):
     name = ''
     dirname = 'cifar10'
 
-    def __init__(self, filepath):
+    def __init__(self, filepath, transform=None):
         data = None
         labels = []
 
@@ -70,6 +70,8 @@ class CIFAR10(Dataset):
             data = data.transpose((0, 2, 3, 1))  # convert to HWC
             labels = np.array(test_data_dict['labels'])
 
+        if transform is not None:
+            data = transform(data)
         self.data = nets.Tensor(data)
         self.labels = nets.Tensor(labels)
 

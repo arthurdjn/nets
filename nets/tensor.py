@@ -4,6 +4,7 @@ Defines tensors for deep learning application. A tensor is multi-dimensional arr
 
 import numpy as np
 import nets
+from nets.utils import BackwardCallError
 
 
 def to_array(arrayable):
@@ -102,6 +103,18 @@ class Tensor(object):
     def T(self):
         return nets.transpose(self)
 
+    def astype(self, new_type):
+        r"""Set a new type to the ``Tensor``'s data.
+
+        Args:
+            new_type (type): new type to convert the data
+
+        Returns:
+            None
+        """
+        self.detach()
+        return nets.astype(self, new_type)
+
     def detach(self):
         r"""Unlink the ``Tensor`` to the computational graph.
         By calling this method, the attribute ``_hooks`` and ``grad`` are set to their default values,
@@ -111,7 +124,7 @@ class Tensor(object):
             None
         """
         self.grad = None
-        self._hooks = None
+        self._hooks = []
 
     def zero_grad(self):
         r"""Set to a zero ``Tensor`` the gradient. This is call when initializing a ``Tensor`` that requires gradient
@@ -141,8 +154,14 @@ class Tensor(object):
             To be able to back-propagate, the top-level ``Tensor`` must have ``requires_grad`` set to ``True``
             to propagate the gradient.
         """
-        assert self.requires_grad, "called backward on non-requires-grad tensor"
-
+        # Check if the backward pass is legit
+        if not self.requires_grad:
+            raise BackwardCallError(r"called backward on non `requires_grad` tensor. Either there was no "
+                                    r"`requires_grad=True` initialization or gradients were set to `None` due to an "
+                                    r"inplace operation or the computational graph was split and gradients are no "
+                                    r"longer linked to this branch. Graph are usually split when a new tensor is "
+                                    r"created from a `numeric` function (zero, ones, eye, identity) and "
+                                    r"`requires_grad` was not specified.")
         if grad is None:
             if self.shape == ():
                 grad = Tensor(1.0)
@@ -183,7 +202,7 @@ class Tensor(object):
         Returns:
             list
         """
-        # self.detach()
+        self.detach()
         return self.data.tolist()
 
     def numpy(self):
@@ -192,7 +211,7 @@ class Tensor(object):
         Returns:
             numpy.ndarray
         """
-        # self.detach()
+        self.detach()
         return self.data
 
     def sum(self, axis=None):
@@ -206,15 +225,18 @@ class Tensor(object):
         """
         return nets.sum(self, axis)
 
-    def transpose(self):
+    def transpose(self, *indices):
         r"""Transpose the ``Tensor``. The operation is not in-place.
+
+        Args:
+            indices (tuple): permutation
 
         Returns:
             Tensor
         """
-        return nets.transpose(self)
+        return nets.transpose(self, indices)
 
-    def reshape(self, shape):
+    def reshape(self, *shapes):
         r"""Reshape a ``Tensor`` with a new shape. The transformation is not made in-place.
 
         .. note::
@@ -223,16 +245,30 @@ class Tensor(object):
             If its not the case, the reshape method will raise an error.
 
         Args:
-            shape (tuple): new shape of the ``Tensor``
+            *shapes int: permutation
 
         Returns:
             Tensor
         """
-        return nets.reshape(self, shape)
+        return nets.reshape(self, shapes)
+
+    def flatten(self):
+        r"""Flatten a ``Tensor`` with a new shape. The transformation is not made in-place.
+
+        Returns:
+            Tensor
+        """
+        return nets.flatten(self)
 
     def __repr__(self):
-        string_data = np.array2string(self.data, prefix="       ",
-                                      precision=4)
+        string_data = np.array2string(self.data,
+                                      prefix="       ",
+                                      precision=4,
+                                      separator=', ',
+                                      floatmode='maxprec_equal',
+                                      edgeitems=3,
+                                      threshold=100,
+                                      max_line_width=100)
         requires_grad = "" if not self.requires_grad else f", requires_grad={self.requires_grad}"
         return f"Tensor({string_data}{requires_grad})"
 
@@ -310,5 +346,4 @@ class Tensor(object):
         return nets.slice(self, indices)
 
     def __setitem__(self, key, value):
-        self._hooks = None
-        self.data[key] = value
+        return nets.set(self, key, value)

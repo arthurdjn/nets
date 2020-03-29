@@ -34,8 +34,8 @@ class Linear(Module):
         # self.weight = Parameter(shape=(self.input_dim, self.output_dim))
         # self.bias = Parameter(shape=(self.output_dim,))
 
-    # @deprecated("weights and biases will be initialized in another function soon. "
-    #             "This method will be then deprecated in the next update")
+    @deprecated("weights and biases will be initialized in another function soon. "
+                "This method will be then deprecated in the next update")
     def init_params(self, mode=None):
         r"""Initialize the parameters dictionary.
         For Dense Neural Module, the parameters are either weights or biases. They are saved in the dictionary
@@ -44,8 +44,8 @@ class Linear(Module):
         initialization or use :math:`\text{He et al.}  \quad \mathcal{N} (0, \frac{1}{input_dim})`.
         """
         if mode == 'uniform':
-            self.weight = Parameter(shape=(self.input_dim, self.output_dim))
-            self.bias = Parameter(shape=(self.output_dim,))
+            self.weight = Parameter.uniform((self.input_dim, self.output_dim))
+            self.bias = Parameter.uniform((self.output_dim,))
         else:
             mu = 0
             var = 2 / self.input_dim
@@ -66,33 +66,33 @@ class Linear(Module):
         assert x.shape[1] == self.input_dim, 'dot product impossible with ' \
                                              'shape {} and {}'.format(x.shape, self._params['weight'].shape)
         # Linear combination
-        z = x @ self.weight + self.bias
+        z = nets.dot(x, self.weight) + self.bias
         # Keep track of inputs for naive back-propagation
         self._cache['x'] = x
         return z
 
-    def backward(self, grad):
+    def backward(self, dout):
         r"""Backward pass for a single Linear layer.
 
         Shape:
             - input (Tensor): upstream gradient.
             - output (Tensor): downstream gradient after a linear transformation.
         """
-        coef = 1 / grad.shape[0]  # Normalize by the batch_size
+        coef = 1 / dout.shape[0]  # Normalize by the batch_size
         # Get parameters
         x = self._cache['x']
         w = self.weight
         # Compute the gradients
-        dz = grad
-        dw = coef * np.dot(x.T, dz)
-        db = coef * np.sum(dz, axis=0)
+        dw = coef * np.dot(x.T, dout)
+        db = coef * np.sum(dout, axis=0)
         # Save the parameters' gradient
         self._grads['b'] = db
         self._grads['w'] = dw
         # Return the new downstream gradient
-        grad = np.dot(dz, w.T)
-        return grad
+        dx = np.dot(dout, w.T)
+        return dx
 
     def inner_repr(self):
+        """Display the inner parameter of a Linear layer"""
         return f"input_dim={self.input_dim}, output_dim={self.output_dim}, " \
                f"bias={True if self.bias is not None else False}"

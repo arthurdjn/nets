@@ -1,18 +1,18 @@
-from typing import Iterator, NamedTuple
-import numpy as np
-
-from nets.tensor import Tensor
-
-Batch = NamedTuple("Batch", [("inputs", Tensor), ("targets", Tensor)])
+"""
+A ``Batch`` is a set of examples, usually normalized and scaled for faster predictions.
+"""
 
 
 class Batch(object):
+    """
+    A ``Batch``depends on a ``Dataset`` and is made of ``batch_size`` ``Example``.
+    """
     def __init__(self, example, batch_size):
         self.example = example
         self.batch_size = batch_size
 
     def normalize(self):
-        pass
+        raise NotImplementedError
 
     def __getitem__(self, item):
         return self.example[item]

@@ -8,3 +8,4 @@ from nets.numeric import *
 # Import the functions compatible with automatic differentiation
 from nets.autograd.ops import *
 from nets.autograd.functions import *
+from nets.autograd.numeric import *

@@ -13,29 +13,6 @@ import nets
 from .hook import Hook
 
 
-def transpose(t):
-    r"""Transpose a tensor object.
-
-    .. math::
-
-        T_{out} = (t_{i, j}^{[out]})_{i, j} \quad where \quad t_{i, j}^{[out]} = t_{j ,i}
-
-    Args:
-        t (Tensor):
-
-    Returns:
-        Tensor
-    """
-    t = nets.to_tensor(t)
-    data = t.data.T
-    requires_grad = t.requires_grad
-    hooks = []
-    if requires_grad:
-        hooks.append(Hook(t, lambda grad: grad.T))
-
-    return nets.Tensor(data, requires_grad, hooks)
-
-
 def where(cond, t1, t2):
     r"""Transformation regarding a condition.
 

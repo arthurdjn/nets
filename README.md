@@ -1,22 +1,28 @@
 ![NETS](img/nets.png)
 
 
-**NETS** is a Python package for deep learning application and networks construction
-from scratch using **numpy**
-and an autograd system (you can switch to vanilla gradient update too).
-
-
-# Get Started
+# Overview
 
 ### About
-**NETS** is a vanilla Deep Learning framework, made using only **numpy**.
-This project was first introduced as an assignment I made at the 
-[University of Oslo](https://www.uio.no/studier/emner/matnat/ifi/IN5400/), which is similar to the second
-assignment from [Stanford University](http://cs231n.stanford.edu/syllabus.html) if you are curious.
 
-However, this project was rebuild to make it entirely *object-oriented like*.
-In addition, the back-propagation and update rules where changed, using the **autograd** system.
-**NETS** was highly inspired from [PyTorch](https://pytorch.org/) and [TensorFlow](https://www.tensorflow.org/)
+**NETS** is a light-weight Deep Learning **Python** package, made using only (mostly) **numpy**.
+This project was first introduced as an assignment at the 
+[University of Oslo](https://www.uio.no/studier/emner/matnat/ifi/IN5400/), which is similar to the second
+assignment from [Stanford University](http://cs231n.stanford.edu/syllabus.html).
+
+However, this project was pushed further to make it *OOP* with an easier API.
+In addition, the back-propagation and update rules where changed, using a custom **autograd** system.
+**NETS** was highly inspired from [PyTorch](https://pytorch.org/) and [TensorFlow](https://www.tensorflow.org/) 
+packages.
+
+### Who needs NETS ?
+
+**NETS** package has **NO CLAIMS** to shadow already well build deep learning packages like **PyTorch** 
+or **TensorFlow**. Instead, this package was made to understand how all of these libraries work and handle
+forward / backward propagation by making one from scratch.
+As I am going through this *deep* understanding, I found interesting to share 
+as much as possible my work, which I hope will help students or people that want to learn more about this subject.
+
 
 ### Requirements
 
@@ -29,6 +35,7 @@ packages can offer a better experience if installed (saving checkpoints and mode
 - **pandas** (Optional)
 - **scipy** (Optional)
 - **sklearn** (Optional)
+
 
 ### Installation
 
@@ -45,15 +52,32 @@ $ cd nets
 $ pip install .
 ````
 
+
+### Current Status
+
+| Development                   | Current Status | Feature       | 
+|-------------------------------|----------------|---------------|
+| Autograd System               | finished       | <ul><li>[x] Tensor</li><li>[x] Parameter</li></ul>
+| Optimization                  | in progress    | <ul><li>[x] SGD</li><li>[ ] Adam</li><li>[ ] Adadelta</li></ul>
+| Loss                          | in progress    | <ul><li>[x] MSE</li><li>[x] Cross Entropy</li><li>[ ] BCE</li></ul>
+| Solver                        | in progress    | <ul><li>[x] Train</li><li>[x] Eval</li><li>[x] Checkpoints</li></ul>
+| Data                          | finished       | <ul><li>[x] Dataset</li><li>[x] Batch</li><li>[x] Iterator</li></ul>
+| Dense Neural Network          | finished       | <ul><li>[x] Linear</li><li>[x] Sequential</li></ul>
+| Convolutional Neural Network  | in progress    | <ul><li>[x] Conv2d</li><li>[x] MaxPool2d</li><li>[ ] Dropout</li></ul>
+| Recurrent Neural Network      | not started    | <ul><li>[ ] RNN</li><li>[ ] LSTM</li><li>[ ] GRU</li></ul>
+
+
 ### Documentation
 
 The documentation and tutorials are in process and will be released soon. 
 You will find some tutorials and application on how to get started or build a similar package.
 
-# Example
+# Get Started
 
-**NETS** provides a basic neural network structure so you can create your own with numpy. You will need to
-wrap your arrays in a ``Tensor`` class to keep track of the gradients.
+
+**NETS** architecture follows the one from **PyTorch**. 
+It provides a basic neural network structure so you can create your own with numpy. You will need to
+wrap your arrays in a ``Tensor`` class to keep track of the gradients, just like in **PyTorch**.
 
 ![NETS](img/xor.gif)
 
@@ -111,7 +135,7 @@ Again, this is really similar to what **PyTorch** offers.
 
 # Tutorials
 
-* 1 - [Getting Started with NETS](https://github.com/arthurdjn/nets/blob/master/Getting%20Started%20with%20NETS.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/arthurdjn/nets/blob/master/Getting%20Started%20with%20NETS.ipynb)
+* 1 - [Getting Started with NETS](https://github.com/arthurdjn/nets/blob/master/%0%20-%20Getting%20Started%20with%20NETS.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/arthurdjn/nets/blob/master/%0%20-%20Getting%20Started%20with%20NETS.ipynb)
 
     This tutorial highlights the main part and modules of **NETS**.
 
@@ -126,6 +150,7 @@ Again, this is really similar to what **PyTorch** offers.
 * 4 - [Build a CNN with NumPy]()
 
     To be released
+
 
 # References
 
