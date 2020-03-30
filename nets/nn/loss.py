@@ -8,7 +8,6 @@ from abc import ABC, abstractmethod
 import numpy as np
 import nets
 from nets.nn.module import Module
-from scipy.special import softmax
 
 
 class Loss(Module):
@@ -45,7 +44,7 @@ class Loss(Module):
         return cost
 
 
-class MSE(Loss):
+class MSELoss(Loss):
     r"""Mean Square Error Loss, defined as:
 
     .. math::
@@ -89,5 +88,5 @@ class CrossEntropyLoss(Loss):
 
     def backward(self, predictions, labels):
         assert labels.dtype == int, "unsupported labels type {} for cross entropy loss".format(predictions.dtype)
-        predictions = softmax(predictions)
+        predictions = nets.softmax(predictions)
         return predictions - labels

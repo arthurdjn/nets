@@ -79,6 +79,57 @@ def minimum(t1, t2):
     return where(t1 > t2, t2, t1)
 
 
+def pow(t, power):
+    r"""Power a tensor-like object.
+
+    .. math::
+
+        T_{out} = T^2
+
+    Args:
+        t (Tensor like): reference tensor
+        power (int): power to elevate a tensor
+
+    Returns:
+        Tensor
+    """
+    assert type(power) == int, "unsupported type {} for power. Currently supported type: int".format(type(power))
+    t = nets.to_tensor(t)
+    data = t.data ** power
+    requires_grad = t.requires_grad
+    hooks = []
+    # Update the gradient
+    if requires_grad:
+        hooks.append(Hook(t, lambda grad: grad * power * t.data ** (power - 1)))
+
+    return nets.Tensor(data, requires_grad, hooks)
+
+
+def sqrt(t):
+    r"""Square root of a tensor-like object.
+
+    .. math::
+
+        T_{out} = T^2
+
+    Args:
+        t (Tensor like): reference tensor
+        power (int): power to elevate a tensor
+
+    Returns:
+        Tensor
+    """
+    t = nets.to_tensor(t)
+    data = np.sqrt(t.data)
+    requires_grad = t.requires_grad
+    hooks = []
+    # Update the gradient
+    if requires_grad:
+        hooks.append(Hook(t, lambda grad: - 1 / (2 * np.sqrt(t.data)) * grad))
+
+    return nets.Tensor(data, requires_grad, hooks)
+
+
 def exp(t):
     r"""Exponentiation f a tensor.
 
@@ -121,32 +172,6 @@ def log(t):
     # Update the gradient
     if requires_grad:
         hooks.append(Hook(t, lambda grad: grad * np.divide(1, t.data)))
-
-    return nets.Tensor(data, requires_grad, hooks)
-
-
-def pow(t, power):
-    r"""Power a tensor-like object.
-
-    .. math::
-
-        T_{out} = T^2
-
-    Args:
-        t (Tensor like): reference tensor
-        power (int): power to elevate a tensor
-
-    Returns:
-        Tensor
-    """
-    assert type(power) == int, "unsupported type {} for power. Currently supported type: int".format(type(power))
-
-    data = t.data ** power
-    requires_grad = t.requires_grad
-    hooks = []
-    # Update the gradient
-    if requires_grad:
-        hooks.append(Hook(t, lambda grad: grad * power * t.data ** (power - 1)))
 
     return nets.Tensor(data, requires_grad, hooks)
 

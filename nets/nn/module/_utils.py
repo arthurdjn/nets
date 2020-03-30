@@ -28,7 +28,7 @@ def im2col(input_data, filter_h, filter_w, stride=1, pad=0):
 
     .. warning::
 
-        This function is not compatible with ``autograd``system. The resulting ``Tensor`` has no linked to a
+        This function is not compatible with ``autograd``system. The resulting ``Tensor`` has no links to a
         previous computational graph, and in addition its gradient is set to ``None``.
 
     """
@@ -77,7 +77,7 @@ def col2im(col, input_shape, filter_h, filter_w, stride=1, pad=0):
 
     .. warning::
 
-        This function is not compatible with ``autograd``system. The resulting ``Tensor`` has no linked to a
+        This function is not compatible with ``autograd``system. The resulting ``Tensor`` has no links to a
         previous computational graph, and in addition its gradient is set to ``None``.
 
     """

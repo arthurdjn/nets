@@ -15,7 +15,7 @@ In addition, the back-propagation and update rules where changed, using a custom
 **NETS** was highly inspired from [PyTorch](https://pytorch.org/) and [TensorFlow](https://www.tensorflow.org/) 
 packages.
 
-### Who needs NETS ?
+### But why ?
 
 **NETS** package has **NO CLAIMS** to shadow already well build deep learning packages like **PyTorch** 
 or **TensorFlow**. Instead, this package was made to understand how all of these libraries work and handle
@@ -55,15 +55,15 @@ $ pip install .
 
 ### Current Status
 
-| Development                   | Current Status | Feature       | 
+| Development                   | Status         | Feature       | 
 |-------------------------------|----------------|---------------|
 | Autograd System               | finished       | <ul><li>[x] Tensor</li><li>[x] Parameter</li></ul>
-| Optimization                  | in progress    | <ul><li>[x] SGD</li><li>[ ] Adam</li><li>[ ] Adadelta</li></ul>
+| Optimization                  | finished       | <ul><li>[x] SGD</li><li>[x] Adam</li><li>[x] RMSprop</li></ul>
 | Loss                          | in progress    | <ul><li>[x] MSE</li><li>[x] Cross Entropy</li><li>[ ] BCE</li></ul>
-| Solver                        | in progress    | <ul><li>[x] Train</li><li>[x] Eval</li><li>[x] Checkpoints</li></ul>
+| Solver                        | finished       | <ul><li>[x] Train</li><li>[x] Eval</li><li>[x] Checkpoints</li></ul>
 | Data                          | finished       | <ul><li>[x] Dataset</li><li>[x] Batch</li><li>[x] Iterator</li></ul>
 | Dense Neural Network          | finished       | <ul><li>[x] Linear</li><li>[x] Sequential</li></ul>
-| Convolutional Neural Network  | in progress    | <ul><li>[x] Conv2d</li><li>[x] MaxPool2d</li><li>[ ] Dropout</li></ul>
+| Convolutional Neural Network  | finished       | <ul><li>[x] Conv2d</li><li>[x] MaxPool2d</li><li>[x] Dropout</li></ul>
 | Recurrent Neural Network      | not started    | <ul><li>[ ] RNN</li><li>[ ] LSTM</li><li>[ ] GRU</li></ul>
 
 

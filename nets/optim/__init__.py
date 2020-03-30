@@ -1,2 +1,4 @@
-from nets.optim.optimizer import *
-from nets.optim.sgd import *
+from .optimizer import *
+from .sgd import SGD
+from .adam import Adam
+from .rmsprop import RMSprop
