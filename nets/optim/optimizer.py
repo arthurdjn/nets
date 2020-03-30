@@ -15,6 +15,7 @@ class Optimizer(ABC):
 
     @abstractmethod
     def step(self):
+        """Update the parameters. Should be used only with ``autograd``system"""
         raise NotImplementedError
 
     def zero_grad(self):
@@ -25,3 +26,7 @@ class Optimizer(ABC):
         """
         for parameter in self.parameters:
             parameter.zero_grad()
+
+    def backward(self):
+        """Update rules without ``autograd``"""
+        raise NotImplementedError
