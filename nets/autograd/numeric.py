@@ -104,7 +104,7 @@ def max(t, axis=None):
 
     Args:
         t (Tensor): tensor to transform
-        axis (scalar, optional): scalar affected in the padding
+        axis (int, optional): index of the axis to search. Default is ``None``.
 
     Returns:
         Tensor
@@ -117,9 +117,11 @@ def max(t, axis=None):
         def grad_fn(grad):
             bigger_grad = np.zeros_like(t.data)
             if axis is None:
+                # If there is no axis, the argmax is the location of he maximum single element
                 max_indices = np.unravel_index(np.argmax(t.data), t.shape)
                 bigger_grad[max_indices] = grad
             else:
+                # If there is an axis, we reconstruct the bigger matrix by 'rolling' on this axis
                 max_indices = np.argmax(t.data, axis=axis)
                 for i, roll in enumerate(np.rollaxis(bigger_grad, axis)):
                     roll += (max_indices == i).astype(int) * grad
@@ -132,6 +134,15 @@ def max(t, axis=None):
 
 
 def argmax(t, axis=None):
+    r"""Get the indices of maximum elements from a ``Tensor``.
+
+    Args:
+        t (Tensor): tensor get maximum indices from
+        axis (int, optional): index of the axis. Default is ``None``.
+
+    Returns:
+        Tensor
+    """
     t = nets.to_tensor(t)
     if axis is None:
         return nets.Tensor(np.unravel_index(np.argmax(t.data), t.shape))
@@ -140,4 +151,89 @@ def argmax(t, axis=None):
 
 
 def flatten(t):
-    return reshape(t, (t.size, ))
+    r"""Reshape in 1-dimensional a ``Tensor``.
+
+    Args:
+        t (Tensor): tensor get reshape.
+
+    Returns:
+        Tensor
+    """
+    return reshape(t, (t.size,))
+
+
+ITERABLE = (list, tuple)
+
+
+def concatenate(iterable):
+    r"""Concatenate multiples ``Tensor`` from an iterable.
+
+    .. note::
+
+        The ``Tensor`` in ``iterable`` should and must have the same shape.
+
+    Args:
+        iterable (tuple, list): list containing ``Tensor`` to concatenate.
+
+    Returns:
+        Tensor: the concatenation of all ``Tensor``.
+    """
+    assert isinstance(iterable, ITERABLE), f'iterable type {type(iterable)} unsupported for `concatenate` function.' \
+                                           f'Types currently supported are list, tuple.'
+    requires_grad = False
+    hooks = []
+    data = np.array([])
+    for idx, t in enumerate(iterable):
+        t = nets.to_tensor(t)
+        requires_grad = t.requires_grad or requires_grad
+        if data.size == 0:
+            data = t.data
+        else:
+            data = np.concatenate((data, t.data))
+        if t.requires_grad:
+            def grad_fn(grad):
+                return grad[idx:idx+t.shape[0]]
+
+            hooks.append(Hook(t, grad_fn))
+    return nets.Tensor(data, requires_grad, hooks)
+
+
+def append(t, value):
+    r"""Append multiples ``Tensor`` from an iterable.
+
+    .. note::
+
+        The ``Tensor`` in ``iterable`` should and must have the same shape.
+
+    Args:
+        t (Tensor): list containing ``Tensor`` to concatenate.
+
+    Returns:
+        Tensor: the concatenation of all ``Tensor``.
+    """
+    t = nets.to_tensor(t)
+    value = nets.to_tensor(value)
+    requires_grad = False
+    hooks = []
+    requires_grad = t.requires_grad or value.requires_grad
+    if t.size == 0:
+        data = [value.data]
+    elif value.size == 0:
+        data = [t.data]
+    else:
+        data = t.data.tolist()
+        data.append(value.data)
+
+    if t.requires_grad:
+        def grad_fn(grad):
+            return grad[:-1]
+        hooks.append(Hook(t, grad_fn))
+
+    if value.requires_grad:
+        def grad_fn(grad):
+            return grad[-1]
+        hooks.append(Hook(value, grad_fn))
+
+    return nets.Tensor(data, requires_grad, hooks)
+
+

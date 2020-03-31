@@ -2,6 +2,7 @@ r"""
 Defines a basic Recurrent Neural Network.
 """
 
+import copy
 from .rnnbase import RNNBase
 from nets import Parameter
 import nets
@@ -30,7 +31,7 @@ class RNN(RNNBase):
         self.bias_h = Parameter.zeros(shape=(hidden_dim,))
         self.bias_o = Parameter.zeros(shape=(input_dim,))
         # Initialize the first hidden cell
-        self.hidden_0 = nets.zeros(shape=(input_dim,))
+        self.hidden_0 = nets.zeros(shape=(1, hidden_dim))
 
     # TODO: deprecate this
     def set_hidden_0(self, hidden_cell):
@@ -38,7 +39,7 @@ class RNN(RNNBase):
         assert isinstance(hidden_cell, list), '``hidden_states`` should be a list containing ``Tensor`` objects.'
         self.hidden_0 = hidden_cell
 
-    def forward_pass(self, inputs):
+    def forward(self, inputs):
         """
         Computes the forward pass of a vanilla RNN.
 
@@ -50,15 +51,15 @@ class RNN(RNNBase):
         # Initialize hidden_cell_0 (with zeros)
         hidden_state = self.hidden_0
         # For each element in input sequence
-        for t in range(len(inputs)):
+        for t in range(inputs.shape[0]):
             # Compute new hidden state
             hidden_state = nets.tanh(nets.dot(inputs[t], self.weight_ih) +
                                      nets.dot(hidden_state, self.weight_hh) + self.bias_h)
             # Compute output
-            out = nets.softmax(nets.dot(self.weight_ho, hidden_state) + self.bias_o)
+            out = nets.sigmoid(nets.dot(hidden_state, self.weight_ho) + self.bias_o)
             # Save results and continue
-            outputs.append(out)
-            hidden_states.append(hidden_state.copy())
+            outputs = nets.append(outputs, out)
+            hidden_states = nets.append(hidden_states, hidden_state)
 
         return outputs, hidden_states
 

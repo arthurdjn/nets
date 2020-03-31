@@ -5,6 +5,7 @@ Defines tensors for deep learning application. A tensor is multi-dimensional arr
 import numpy as np
 import nets
 from nets.utils import BackwardCallError
+from nets.utils import deprecated
 
 
 def to_array(arrayable):
@@ -24,6 +25,7 @@ def to_array(arrayable):
         return np.array(arrayable)
 
 
+# TODO: recursively check if Tensor are inside a list, array... and delete nested Tensor.
 def to_tensor(tensorable):
     """Convert an object to a ``Tensor`` if possible.
 
@@ -102,6 +104,19 @@ class Tensor(object):
     @property
     def T(self):
         return nets.transpose(self)
+
+    @deprecated("This version is deprecated since v0.1. Please add a hook through the constructor instead."
+                "Note that in next version another method will be created.")
+    def register_hook(self, hook):
+        """Register a hook to a ``Tensor``
+
+        Args:
+            hook (Hook): hook to register
+
+        Returns:
+            None
+        """
+        self._hooks.append(hook)
 
     def astype(self, new_type):
         r"""Set a new type to the ``Tensor``'s data.
@@ -260,14 +275,14 @@ class Tensor(object):
         """
         return nets.flatten(self)
 
-    def append(self, t):
+    @deprecated("this version does not support autograd. Please use nets.concatenate instead.")
+    def append(self, t, axis=0):
         r"""
         Append a value(- or tensor) to a ``Tensor``.
 
         .. note::
 
-            The operation takes place in-place.
-
+            The operation takes place in-place and does not support autograd.
 
         Args:
             t (scale, Tensor): object to add
@@ -275,7 +290,9 @@ class Tensor(object):
         Returns:
             None
         """
-        nets.append(self, t)
+        data = to_array(self)
+        value = to_array(t)
+        self.data = np.append(data, value, axis=axis)
 
     def __repr__(self):
         string_data = np.array2string(self.data,

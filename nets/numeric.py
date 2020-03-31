@@ -50,7 +50,9 @@ def concatenate(t1, t2):
 
 
 # TODO: move to autograd
-def append(t, value):
-    nets.Tensor(np.append(t.data, value))
+def append(t, value, axis=None):
+    value = nets.to_array(value)
+    data = np.append(t.data, value, axis=axis)
+    return nets.Tensor(data)
 
 # TODO: vstack, hstack etc. with autograd

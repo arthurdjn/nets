@@ -106,7 +106,7 @@ class Parameter(Tensor):
         data = np.random.randn(rows, cols)
 
         if rows < cols:
-            new_param = data.T
+            data = data.T
 
         # Compute QR factorization
         q, r = np.linalg.qr(data)
