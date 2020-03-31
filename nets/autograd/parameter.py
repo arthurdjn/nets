@@ -42,7 +42,7 @@ class Parameter(Tensor):
         return Parameter(data=data)
 
     @classmethod
-    def zero(cls, shape):
+    def zeros(cls, shape):
         r"""Generate a zero-Parameter
 
         Args:
@@ -54,19 +54,19 @@ class Parameter(Tensor):
         return Parameter(data=np.zeros(shape))
 
     @classmethod
-    def uniform(cls, shape, lower=-1, upper=1):
+    def uniform(cls, shape, low=-1, high=1):
         r"""Generate a ``Parameter`` with data following a uniform distribution between ``lower`` and ``upper``.
 
         Args:
             shape (tuple): shape of the ``Parameter``
-            lower (scalar): lower bound of the uniform distribution. Default is ``-1``.
-            upper (scalar): upper bound of the uniform distribution. Default is ``1``.
+            low (scalar): lower bound of the uniform distribution. Default is ``-1``.
+            high (scalar): upper bound of the uniform distribution. Default is ``1``.
 
         Returns:
             Parameter
         """
-        data = np.random.uniform(lower, upper, shape)
-        return Parameter(data)
+        data = np.random.uniform(low, high, shape)
+        return Parameter(data=data)
 
     @classmethod
     def normal(cls, shape, mu=0, sigma=1):
@@ -82,4 +82,41 @@ class Parameter(Tensor):
             Parameter
         """
         data = np.random.normal(mu, sigma, shape)
-        return Parameter(data)
+        return Parameter(data=data)
+
+    @classmethod
+    def orthogonal(cls, shape):
+        r"""Initializes weight parameters orthogonally.
+        From the [exercise 02456 from DTU course](https://github.com/DeepLearningDTU/02456-deep-learning-with-PyTorch).
+
+        .. note::
+
+            Refer to [this paper](https://arxiv.org/abs/1312.6120) for an explanation of this initialization.
+
+        Args:
+            shape (tuple): shape of dimensionality greater than 2 (weight matrix)
+
+        Returns:
+            Parameter
+        """
+        if len(shape) < 2:
+            raise ValueError("only parameters with 2 or more dimensions are supported.")
+
+        rows, cols = shape
+        data = np.random.randn(rows, cols)
+
+        if rows < cols:
+            new_param = data.T
+
+        # Compute QR factorization
+        q, r = np.linalg.qr(data)
+        # Make Q uniform according to https://arxiv.org/pdf/math-ph/0609050.pdf
+        diag = np.diag(r, 0)
+        sign = np.sign(diag)
+        q *= sign
+
+        if rows < cols:
+            q = q.T
+
+        data = q
+        return Parameter(data=data)

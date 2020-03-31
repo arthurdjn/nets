@@ -31,7 +31,7 @@ class Conv2d(Module):
         # more at https://pytorch.org/docs/stable/nn.html
         bound = 1 / (in_channels * np.product(filter_size))
         self.weight = Parameter.uniform((out_channels, in_channels, *filter_size), -bound, bound)
-        self.bias = Parameter.normal((out_channels,), -bound, bound)
+        self.bias = Parameter.zeros((out_channels, ))
 
     def forward(self, inputs):
         FN, C, FH, FW = self.weight.shape

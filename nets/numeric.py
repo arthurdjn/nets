@@ -44,4 +44,13 @@ def astype(t, new_type):
     return nets.Tensor(t.data.astype(new_type))
 
 
+# TODO: move to autograd
+def concatenate(t1, t2):
+    return nets.Tensor(np.concatenate(t1.data, t2.data))
 
+
+# TODO: move to autograd
+def append(t, value):
+    nets.Tensor(np.append(t.data, value))
+
+# TODO: vstack, hstack etc. with autograd

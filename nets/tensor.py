@@ -260,6 +260,23 @@ class Tensor(object):
         """
         return nets.flatten(self)
 
+    def append(self, t):
+        r"""
+        Append a value(- or tensor) to a ``Tensor``.
+
+        .. note::
+
+            The operation takes place in-place.
+
+
+        Args:
+            t (scale, Tensor): object to add
+
+        Returns:
+            None
+        """
+        nets.append(self, t)
+
     def __repr__(self):
         string_data = np.array2string(self.data,
                                       prefix="       ",

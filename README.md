@@ -41,16 +41,16 @@ packages can offer a better experience if installed (saving checkpoints and mode
 
 To install this package from [PyPi](https://pypi.org)
 
-````css
+``css
 $ pip install nets
-````
+```
 
 or from this repository
-````css
+```css
 $ git clone https://github.com/arthurdjn/nets
 $ cd nets
 $ pip install .
-````
+```
 
 
 ### Current Status
@@ -64,7 +64,7 @@ $ pip install .
 | Data                          | finished       | <ul><li>[x] Dataset</li><li>[x] Batch</li><li>[x] Iterator</li></ul>
 | Dense Neural Network          | finished       | <ul><li>[x] Linear</li><li>[x] Sequential</li></ul>
 | Convolutional Neural Network  | finished       | <ul><li>[x] Conv2d</li><li>[x] MaxPool2d</li><li>[x] Dropout</li></ul>
-| Recurrent Neural Network      | not started    | <ul><li>[ ] RNN</li><li>[ ] LSTM</li><li>[ ] GRU</li></ul>
+| Recurrent Neural Network      | in progress    | <ul><li>[x] RNN</li><li>[ ] LSTM</li><li>[ ] GRU</li></ul>
 
 
 ### Documentation
@@ -92,7 +92,7 @@ if you prefer to manually compute the gradients, you will need to override the `
 Your ``Model`` should inherits from the ``Module`` class and override
 the ``forward`` method.
 
-````python
+```python
 import nets
 import nets.nn as nn
 
@@ -120,34 +120,34 @@ model = Model(10, 100, 2)
 
 # Let's check the architecture
 model
-````
+```
 
 Out:
-````pycon
+```pycon
 Model(
    (layer1): Linear(input_dim=10, output_dim=100, bias=True)
    (layer2): Linear(input_dim=100, output_dim=100, bias=True)
-   (layer3): Linear(input_dim=100, output_dim=5, bias=True)
+   (layer3): Linear(input_dim=100, output_dim=2, bias=True)
 )
-````
+```
 
 Again, this is really similar to what **PyTorch** offers.
 
-# Tutorials
+# Notebooks
 
-* 1 - [Getting Started with NETS](https://github.com/arthurdjn/nets/blob/master/0%20-%20Getting%20Started%20with%20NETS.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/arthurdjn/nets/blob/master/0%20-%20Getting%20Started%20with%20NETS.ipynb)
+* 0 - [Getting Started with NETS](https://github.com/arthurdjn/nets/blob/master/0_Getting_Started_with_NETS.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/arthurdjn/nets/blob/master/0_Getting_Started_with_NETS.ipynb)
 
     This tutorial highlights the main part and modules of **NETS**.
 
-* 2 - [Build an Autograd System with NumPy]()
+* 1 - [Build an Autograd System with NumPy]()
 
     To be released
     
-* 3 - [Build a Deep Learning Library From Scratch]()
+* 2 - [Build a Feed Forward Neural Network with NumPy]()
 
     To be released
     
-* 4 - [Build a CNN with NumPy]()
+* 3 - [Build a Convolutional Neural Network with NumPy]()
 
     To be released
 
