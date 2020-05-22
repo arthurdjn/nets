@@ -1,5 +1,6 @@
 [![](https://img.shields.io/readthedocs/lyricsfandom)](https://arthurdjn.github.io/nets/)
-
+[![](https://img.shields.io/pypi/v/nets)](https://pypi.org/project/nets/)
+![](https://img.shields.io/pypi/status/nets)]
 
 ![NETS](img/nets.png)
 
