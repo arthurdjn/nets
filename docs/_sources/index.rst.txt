@@ -20,16 +20,14 @@ A python package for deep learning application
 
 .. toctree::
     :maxdepth: 1
-    :caption: Usage
+    :caption: Tutorial
 
-    source/usage
+    source/tutorial
 
+    source/tutorial-xor
 
-.. toctree::
-    :maxdepth: 1
-    :caption: Model
+    source/tutorial-cnn
 
-    source/model
 
 
 .. toctree::

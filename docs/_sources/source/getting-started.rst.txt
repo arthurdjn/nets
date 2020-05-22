@@ -1,4 +1,4 @@
-.. image:: images/nets.png
+.. image:: images/Nets.png
 
 
 =====
@@ -6,24 +6,30 @@ About
 =====
 
 
-**NETS** is a vanilla Deep Learning framework, made using only **NumPy**.
+**Nets** is a vanilla Deep Learning framework, made using only **NumPy**.
 This project was first introduced as an assignment I made at the `University of Oslo
 <https://www.uio.no/studier/emner/matnat/ifi/IN5400/>`_ and `Stanford University
 <http://cs231n.stanford.edu/syllabus.html>`_
-.
-However, this project was recreated to make it *object-oriented like*.
-**NETS** was highly inspired from `PyTorch
+
+However, this project was recreated to make it *OOP like*.
+**Nets** was highly inspired from `PyTorch
 <https://pytorch.org/>`_ and `TensorFlow
 <https://www.tensorflow.org/>`_.
 
-============
-Dependencies
-============
 
-**NETS** was made in Python 3.7 and uses multiple machine learning libraries :
+*Nets* package has **NO CLAIMS** to shadow already build deep learning packages like *PyTorch* or *TensorFlow*.
+Instead, this package was made to understand how all of these libraries work and handle forward / backward propagation by making one from scratch.
+As I am going through this deep understanding, I found interesting to share as much as possible my work,
+which I hope will help students or people who want to learn more about deep learning.
+
+
+===========
+Instalation
+===========
+
+**Nets** was made in Python 3.7 and uses multiple machine learning libraries:
 
 - Numpy
-- Pickle
 - Json
 - Time
 - Pandas (Optional)
@@ -32,17 +38,90 @@ Dependencies
 
 
 
-===========
-Instalation
-===========
-
 To use this package, clone the repository at https://github.com/arthurdjn/nets on your laptop and from the root folder,
-run on the commandline :
+run on the commandline:
 
-``pip install .``
+.. code-block::pycon
+
+    git clone https://github.com/arthurdjn/nets
+    cd nets
+    pip install .
+
+Or you can download it directly with pip:
+
+.. code-block::pycon
+
+    pip install nets
+
 
 This will install the package in your python environment and download all the latest dependencies. You can know use and tweak the parameters of pynews' models.
 
 
+=====
+Usage
+=====
 
+
+*Nets* architecture follows the one from *PyTorch*.
+It provides a basic neural network structure so you can create your own with *numpy*.
+You will need to wrap your arrays in a Tensor class to keep track of the gradients, just like in *PyTorch* and *TensorFlow*.
+
+
+Models
+======
+
+A model is a ``Module`` subclass, where biases, weights and parameters transformations are computed.
+All modules have a ``forward`` method, that **MUST** be overwritten.
+This method will compute the forward propagation from an input tensor, and compute the transformation.
+If using the *autograd* system, no back-propagation need to be added.
+However, if you prefer to manually compute the gradients, you will need to override the backward method.
+
+Your Model should inherits from the ``Module`` class and override the forward method.
+
+
+Example:
+
+.. code-block::python
+
+    import nets
+    import nets.nn as nn
+
+    class Model(nn.Module):
+        """
+        Create your own model.
+        The attributes should be your submodels used during the forward pass.
+        You don't have to necessary affect the activation function as an attribute,
+        unless you want to set a manual backward pass.
+        """
+        def __init__(self, input_dim, hidden_dim, output_dim):
+            # Initialization
+            super().__init__() # Don't forget to add this line
+            self.layer1 = nn.Linear(input_dim, hidden_dim)
+            self.layer2 = nn.Linear(hidden_dim, hidden_dim)
+            self.layer3 = nn.Linear(hidden_dim, output_dim)
+
+        def forward(self, inputs):
+            # Forward pass
+            out1 = nets.tanh(self.layer1(inputs))
+            out2 = nets.tanh(self.layer2(out1))
+            return self.layer3(out2)
+
+    model = Model(10, 100, 2)
+
+    # Let's check the architecture
+    model
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+     Out:
+
+    .. code-block:: none
+
+        Model(
+           (layer1): Linear(input_dim=10, output_dim=100, bias=True)
+           (layer2): Linear(input_dim=100, output_dim=100, bias=True)
+           (layer3): Linear(input_dim=100, output_dim=2, bias=True)
+        )
 

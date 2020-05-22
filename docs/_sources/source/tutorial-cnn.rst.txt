@@ -1,0 +1,302 @@
+Open this tutorial in a jupyter `notebook`_.
+
+.. _notebook: https://github.com/arthurdjn/nets/blob/master/2_Build_a_CNN_with_NETS.ipynb
+
+
+====================
+Convolutional Layers
+====================
+
+For this tutorial, the **MNIST** dataset will be used. With this one, it is simple to have good results.
+You can try other popular dataset (like SVHN, CIFAR10 etc.).
+
+Datset
+======
+
+
+.. code-block:: python
+
+    import numpy as np
+    import random as rd
+    import matplotlib.pyplot as plt
+
+    import nets
+    import nets.datasets as datasets
+
+    # IMPORTANT: normalize the data !
+    # 1. reshape from (data_length, 32, 32, 3) to (data_length, 32 * 32 * 3)
+    reshape = lambda x: x.reshape(-1, 784)
+    # 2. scale the data: data = (data - mean) / std
+    normalize = lambda x: (x - np.mean(x, axis=1, keepdims=True)) / np.std(x, axis=1, keepdims=True)
+    # 3. all together
+    transform = lambda x: normalize(reshape(x)).reshape(-1, 1, 28, 28)#.transpose(0, 3, 1, 2)
+
+    # Download the training and testing data
+    train_data, test_data = datasets.MNIST.splits(transform = transform)
+
+    # Check the data
+    train_data
+
+
+.. rst-class:: sphx-glr-script-out
+
+     Out:
+
+    .. code-block:: none
+
+        Dataset MNIST(
+           (data): Tensor(shape=(60000, 1, 28, 28), dtype=float64)
+           (labels): Tensor(shape=(60000,), dtype=uint8)
+        )
+
+
+You can visualize it with the following code:
+
+.. code-block:: python
+
+    # Configure the mosaic to display images
+    fig = plt.figure(figsize = (20, 10))
+    columns = 8
+    rows = 4
+
+    # Create the mosaic
+    for i in range(1, columns * rows + 1):
+        # Choose randomly an image
+        image_index = rd.randint(0, len(train_data))
+        image, label = train_data[image_index]
+        # Plot it
+        fig.add_subplot(rows, columns, i)
+        plt.imshow(image.numpy().reshape(28, 28))
+        # Remove axis and display image's label
+        # plt.title(classes[label.data])
+        plt.axis('off')
+
+    # Render
+    plt.show()
+
+
+.. image:: images/mnist_data.png
+
+
+Data Lodaer
+===========
+
+Once the data is downloaded locally, you will need to create an ``iterator``, which will be used
+to sample in batches the data.
+
+
+.. code-block:: python
+
+    from nets.data import Iterator
+
+    BATCH_SIZE = 64
+
+    iterator = Iterator(train_data,
+                        batch_size = BATCH_SIZE,
+                        shuffle = True)
+
+
+Model
+=====
+
+Then, you can create a ``CNN`` base model:
+
+.. code-block:: python
+
+    import nets.nn as nn
+
+    class Classifier(nn.Module):
+        def __init__(self, input_dim, hidden_dim, output_dim):
+            super().__init__()
+            # Input batch shape: [batch_size, num_channel, height, width]
+            #         for MNIST: [batch_size,       1    ,   28  ,  28  ]
+            self.conv = nn.Conv2d(1, 1, (3, 3), stride=1, pad=0)
+            # Output shape: [batch_size, num_channel, height - 2, width - 2]
+            #           ie: [batch_size,        1   ,      26   ,     26   ]
+            self.pool = nn.MaxPool2d((2, 2), stride=2, pad=0)
+            # Output shape: [batch_size, num_channel, height / 2, width / 2]
+            #           ie: [batch_size,        1   ,      13   ,     13   ]
+
+            # Input shape: [batch_size, num_channel * height * width]
+            #          ie: [batch_size,              169            ]
+            self.layer1 = nn.Linear(input_dim, hidden_dim)
+            # Output shape: [batch_size, hidden_dim]
+            self.layer2 = nn.Linear(hidden_dim, hidden_dim)
+            self.layer3 = nn.Linear(hidden_dim, output_dim)
+            # Output shape: [batch_size, output_dim]
+
+        def forward(self, inputs):
+            # Convolution layer
+            out = self.conv(inputs)
+            # Decrease the dimensions
+            out = self.pool(out)
+            # Transition from 4-d tensor to 2-d tensor
+            out = out.reshape(out.shape[0], -1)
+            # From: [batch_size, 1, H, W]
+            #   to: [batch_size, input_dim]
+            # Classification layer(s)
+            out = nets.relu(self.layer1(out))
+            out = nets.relu(self.layer2(out))
+            # Prediction layer
+            out = self.layer3(out)
+            return out
+
+
+    model = Classifier(169, 100, 10)
+
+    # Let's check the architecture
+    model
+
+
+.. rst-class:: sphx-glr-script-out
+
+     Out:
+
+    .. code-block:: none
+
+        Classifier(
+           (conv): Conv2d(in_channels=1, out_channels=1, filter_size=(3, 3), stride=1, pad=0, bias=True)
+           (pool): MaxPool2d(pool_size=(2, 2), stride=2, pad=0)
+           (layer1): Linear(input_dim=169, output_dim=100, bias=True)
+           (layer2): Linear(input_dim=100, output_dim=100, bias=True)
+           (layer3): Linear(input_dim=100, output_dim=10, bias=True)
+        )
+
+
+Optimization
+============
+
+Defines a loss a.k.a. a criterion (how far from the truth should the errors be computed)
+and a weight update rule a.k.a. optimizer.
+
+.. code-block:: python
+
+    from nets.optim import SGD
+    from nets.nn import CrossEntropyLoss, MSE
+    from nets.nn.utils import one_hot
+
+    # How much do we update the parameters
+    LEARNING_RATE = 0.1
+
+    optimizer = SGD(model.parameters(), lr=LEARNING_RATE)
+    criterion = CrossEntropyLoss()
+
+
+
+Training
+========
+
+
+.. code-block:: python
+
+    import time
+    from nets.utils import progress_bar
+
+    # Training iterations
+    EPOCHS = 50
+
+    #Display the time during training
+    start = time.time()
+    # Record the loss
+    history = []
+
+    # Run the simulation EPOCHS times
+    for epoch in range(EPOCHS):
+        # Keep track of the loss at each epoch
+        epoch_loss = 0.0
+        epoch_start = time.time()
+        # Number of batches
+        N  = len(iterator)
+        # Predict for all batches
+        for idx, batch in enumerate(iterator):
+            # Gradients accumulates, therefore we need to set them to zero at each iteration
+            model.zero_grad()
+            # Get the data from the batch
+            image, label = batch
+            # Run the forward pass on the model
+            predictions = model(image)
+            # Get how far are the predictions from the truth (aka gold labels)
+            label = one_hot(label, 10).astype(int)
+            loss = criterion(predictions, label)
+            # Compute the gradient
+            loss.backward()
+            # Update the parameters
+            optimizer.step()
+            # Record the loss for plotting
+            epoch_loss += loss.item() # .item() is really important, it will free the memory from the computational graph
+            # Let's plot a progress bar in the console
+            progress_bar(idx, N, prefix="Training:", start_time=epoch_start)
+        # Update the history of all previous loss
+        history.append(epoch_loss / N)
+        # Check the mean loss for this loop
+        print(f"Epoch: {epoch+1:4d}/{EPOCHS} | loss: {epoch_loss / N:1.3E}")
+    # Duration of the total training loop
+    print('\nTotal time:', time.time() - start)
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+     Out:
+
+    .. code-block:: none
+
+        [...]
+        epoch: 48/50 | loss: 4.765E-02
+        Training: 100% | [==================================================] | Time: 0m 27s | Done !
+        epoch: 49/50 | loss: 4.621E-02
+        Training: 100% | [==================================================] | Time: 0m 27s | Done !
+        epoch: 50/50 | loss: 4.475E-02
+
+        Total time: 1327.5961854457855
+
+
+.. image:: images/mnist_cnn_loss.png
+
+
+Weights visualization
+=====================
+
+You can also visualize the updated weights:
+
+.. code-block:: python
+
+    # Configure the mosaic to display images
+    fig = plt.figure(figsize = (20, 10))
+    columns = 4
+    rows = 1
+
+    # Conv2d filter
+    fig.add_subplot(rows, columns, 1)
+    conv_filter = model._modules['conv'].weight
+    plt.imshow(conv_filter.numpy().reshape(3, 3))
+    plt.title('Conv2d filter')
+    plt.axis('off')
+
+    # Linear1 weight
+    fig.add_subplot(rows, columns, 2)
+    layer1_weightr = model._modules['layer1'].weight
+    plt.imshow(layer1_weightr.numpy())
+    plt.title('Layer1 weight')
+    plt.axis('off')
+
+    # Linear2 weight
+    fig.add_subplot(rows, columns, 3)
+    layer1_weightr = model._modules['layer2'].weight
+    plt.imshow(layer1_weightr.numpy())
+    plt.title('Layer2 weight')
+    plt.axis('off')
+
+    # Linear3 weight
+    fig.add_subplot(rows, columns, 4)
+    layer1_weightr = model._modules['layer3'].weight
+    plt.imshow(layer1_weightr.numpy())
+    plt.title('Layer3 weight')
+    plt.axis('off')
+
+    # Render
+    plt.show()
+
+
+.. image:: images/mnist_cnn_weights.png
+

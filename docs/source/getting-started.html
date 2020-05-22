@@ -29,7 +29,7 @@
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Set Up" href="usage.html" />
+    <link rel="next" title="Tensor" href="tutorial.html" />
     <link rel="prev" title="Welcome to NETS documentation!" href="../index.html" /> 
 
   
@@ -59,12 +59,12 @@
 <div class="container-fluid header-holder tutorials-header" id="header-holder">
   <div class="container">
     <div class="header-container">
-      <a class="header-logo" href="https://pages.github.com/arthurdjn/nets/index.html" aria-label="PyTorch"></a>
+      <a class="header-logo" href="https://arthurdjn.github.io/nets/" aria-label="PyTorch"></a>
 
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://pages.github.com/arthurdjn/nets/source/getting-started.html">Get Started</a>
+            <a href="https://arthurdjn.github.io/nets/getting-started.html">Get Started</a>
           </li>
 
           <li>
@@ -72,11 +72,11 @@
           </li>
 
           <li>
-            <a href="https://pages.github.com/arthurdjn/nets/source/tutorial.html">Tutorials</a>
+            <a href="https://arthurdjn.github.io/nets/source/tutorial.html">Tutorials</a>
           </li>
 
           <li>
-            <a href="https://pages.github.com/arthurdjn/nets/index.html">Docs</a>
+            <a href="https://arthurdjn.github.io/nets/">Docs</a>
           </li>
 
           <li>
@@ -139,18 +139,13 @@
               <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#instalation">Instalation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#usage">Usage</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Usage</span></p>
+<p class="caption"><span class="caption-text">Tutorial</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Set Up</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html#example">Example</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Model</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="model.html">Creation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model.html#evaluation">Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tensor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html#autograd">Autograd</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Package</span></p>
 <ul>
@@ -236,34 +231,59 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <img alt="../_images/nets.png" src="../_images/nets.png" />
+  <img alt="../_images/Nets.png" src="../_images/Nets.png" />
 <div class="section" id="about">
 <h1>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h1>
-<p><strong>NETS</strong> is a vanilla Deep Learning framework, made using only <strong>NumPy</strong>.
-This project was first introduced as an assignment I made at the <a class="reference external" href="https://www.uio.no/studier/emner/matnat/ifi/IN5400/">University of Oslo</a> and <a class="reference external" href="http://cs231n.stanford.edu/syllabus.html">Stanford University</a>
-.
-However, this project was recreated to make it <em>object-oriented like</em>.
-<strong>NETS</strong> was highly inspired from <a class="reference external" href="https://pytorch.org/">PyTorch</a> and <a class="reference external" href="https://www.tensorflow.org/">TensorFlow</a>.</p>
+<p><strong>Nets</strong> is a vanilla Deep Learning framework, made using only <strong>NumPy</strong>.
+This project was first introduced as an assignment I made at the <a class="reference external" href="https://www.uio.no/studier/emner/matnat/ifi/IN5400/">University of Oslo</a> and <a class="reference external" href="http://cs231n.stanford.edu/syllabus.html">Stanford University</a></p>
+<p>However, this project was recreated to make it <em>OOP like</em>.
+<strong>Nets</strong> was highly inspired from <a class="reference external" href="https://pytorch.org/">PyTorch</a> and <a class="reference external" href="https://www.tensorflow.org/">TensorFlow</a>.</p>
+<p><em>Nets</em> package has <strong>NO CLAIMS</strong> to shadow already build deep learning packages like <em>PyTorch</em> or <em>TensorFlow</em>.
+Instead, this package was made to understand how all of these libraries work and handle forward / backward propagation by making one from scratch.
+As I am going through this deep understanding, I found interesting to share as much as possible my work,
+which I hope will help students or people who want to learn more about deep learning.</p>
 </div>
-<div class="section" id="dependencies">
-<h1>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h1>
-<p><strong>NETS</strong> was made in Python 3.7 and uses multiple machine learning libraries :</p>
+<div class="section" id="instalation">
+<h1>Instalation<a class="headerlink" href="#instalation" title="Permalink to this headline">¶</a></h1>
+<p><strong>Nets</strong> was made in Python 3.7 and uses multiple machine learning libraries:</p>
 <ul class="simple">
 <li><p>Numpy</p></li>
-<li><p>Pickle</p></li>
 <li><p>Json</p></li>
 <li><p>Time</p></li>
 <li><p>Pandas (Optional)</p></li>
 <li><p>Scipy (Optional)</p></li>
 <li><p>Scikit-Learn (Optional)</p></li>
 </ul>
-</div>
-<div class="section" id="instalation">
-<h1>Instalation<a class="headerlink" href="#instalation" title="Permalink to this headline">¶</a></h1>
 <p>To use this package, clone the repository at <a class="reference external" href="https://github.com/arthurdjn/nets">https://github.com/arthurdjn/nets</a> on your laptop and from the root folder,
-run on the commandline :</p>
-<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code></p>
+run on the commandline:</p>
+<p>Or you can download it directly with pip:</p>
 <p>This will install the package in your python environment and download all the latest dependencies. You can know use and tweak the parameters of pynews’ models.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<p><em>Nets</em> architecture follows the one from <em>PyTorch</em>.
+It provides a basic neural network structure so you can create your own with <em>numpy</em>.
+You will need to wrap your arrays in a Tensor class to keep track of the gradients, just like in <em>PyTorch</em> and <em>TensorFlow</em>.</p>
+<div class="section" id="models">
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<p>A model is a <code class="docutils literal notranslate"><span class="pre">Module</span></code> subclass, where biases, weights and parameters transformations are computed.
+All modules have a <code class="docutils literal notranslate"><span class="pre">forward</span></code> method, that <strong>MUST</strong> be overwritten.
+This method will compute the forward propagation from an input tensor, and compute the transformation.
+If using the <em>autograd</em> system, no back-propagation need to be added.
+However, if you prefer to manually compute the gradients, you will need to override the backward method.</p>
+<p>Your Model should inherits from the <code class="docutils literal notranslate"><span class="pre">Module</span></code> class and override the forward method.</p>
+<p>Example:</p>
+<blockquote class="sphx-glr-script-out">
+<div><p>Out:</p>
+</div></blockquote>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Model(
+   (layer1): Linear(input_dim=10, output_dim=100, bias=True)
+   (layer2): Linear(input_dim=100, output_dim=100, bias=True)
+   (layer3): Linear(input_dim=100, output_dim=2, bias=True)
+)
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -274,7 +294,7 @@ run on the commandline :</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="usage.html" class="btn btn-neutral float-right" title="Set Up" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="tutorial.html" class="btn btn-neutral float-right" title="Tensor" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="../index.html" class="btn btn-neutral" title="Welcome to NETS documentation!" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -310,8 +330,11 @@ run on the commandline :</p>
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">About</a></li>
-<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li><a class="reference internal" href="#instalation">Instalation</a></li>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#models">Models</a></li>
+</ul>
+</li>
 </ul>
 
             </div>
@@ -354,13 +377,13 @@ run on the commandline :</p>
         <div class="col-md-4 text-center">
           <h2>Docs</h2>
           <p>Access comprehensive developer documentation for Nets</p>
-          <a class="with-right-arrow" href="https://pages.github.com/arthurdjn/nets/index.html">View Docs</a>
+          <a class="with-right-arrow" href="https://arthurdjn.github.io/nets/">View Docs</a>
         </div>
 
         <div class="col-md-4 text-center">
           <h2>Tutorials</h2>
           <p>Get beginners tutorials and create state-of-the-art models</p>
-          <a class="with-right-arrow" href="https://pages.github.com/arthurdjn/nets/source/tutorial.html">View Tutorials</a>
+          <a class="with-right-arrow" href="https://arthurdjn.github.io/nets/source/tutorial.html">View Tutorials</a>
         </div>
 
         <div class="col-md-4 text-center">
@@ -375,22 +398,22 @@ run on the commandline :</p>
   <footer class="site-footer">
     <div class="container footer-container">
       <div class="footer-logo-wrapper">
-        <a href="https://pages.github.com/arthurdjn/nets/index.html" class="footer-logo"></a>
+        <a href="https://arthurdjn.github.io/nets/" class="footer-logo"></a>
       </div>
 
       <div class="footer-links-wrapper">
         <div class="footer-links-col">
           <ul>
-            <li class="list-title"><a href="https://pages.github.com/arthurdjn/nets/index.html">PyTorch</a></li>
-            <li><a href="https://pages.github.com/arthurdjn/nets/source/getting-started.html">Get Started</a></li>
+            <li class="list-title"><a href="https://arthurdjn.github.io/nets/">PyTorch</a></li>
+            <li><a href="https://arthurdjn.github.io/nets/getting-started.html">Get Started</a></li>
             <li><a href="https://arthurdujardin.com/projects/nets.html">Blog</a></li>
           </ul>
         </div>
 
         <div class="footer-links-col">
           <ul>
-            <li><a href="https://pages.github.com/arthurdjn/nets/source/tutorial.html">Tutorials</a></li>
-            <li><a href="https://pages.github.com/arthurdjn/nets/index.html">Docs</a></li>
+            <li><a href="https://arthurdjn.github.io/nets/source/tutorial.html">Tutorials</a></li>
+            <li><a href="https://arthurdjn.github.io/nets/">Docs</a></li>
             <li><a href="https://github.com/arthurdjn/nets/issues" target="_blank">Github Issues</a></li>
           </ul>
         </div>
@@ -414,7 +437,7 @@ run on the commandline :</p>
     <div class="container-fluid">
       <div class="container">
         <div class="mobile-main-menu-header-container">
-          <a class="header-logo" href="https://pages.github.com/arthurdjn/nets/index.html" aria-label="PyTorch"></a>
+          <a class="header-logo" href="https://arthurdjn.github.io/nets/" aria-label="PyTorch"></a>
           <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
         </div>
       </div>
@@ -424,7 +447,7 @@ run on the commandline :</p>
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://pages.github.com/arthurdjn/nets/source/getting-started.html">Get Started</a>
+            <a href="https://arthurdjn.github.io/nets/getting-started.html">Get Started</a>
           </li>
 
 
@@ -433,11 +456,11 @@ run on the commandline :</p>
           </li>
 
           <li>
-            <a href="https://pages.github.com/arthurdjn/nets/source/tutorial.html">Tutorials</a>
+            <a href="https://arthurdjn.github.io/nets/source/tutorial.html">Tutorials</a>
           </li>
 
           <li>
-            <a href="https://pages.github.com/arthurdjn/nets/index.html">Docs</a>
+            <a href="https://arthurdjn.github.io/nets/">Docs</a>
           </li>
 
           <li>
