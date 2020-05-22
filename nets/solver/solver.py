@@ -21,11 +21,8 @@ def get_metrics(gold_labels, predictions, labels=None):
         labels (list, optional): list of classes indices.
 
     Returns:
-        metrics (dict):
-            - precision: float
-            - recall: float
-            - macro_f1: float
-            - confusion matrix: list(list(int))
+        dict
+
     """
     if isinstance(gold_labels, nets.Tensor):
         gold_labels = gold_labels.numpy()
@@ -139,8 +136,6 @@ class Solver(ABC):
             results_train (dict, optional): metrics for the training session at epoch. The default is None.
             results_eval (dict, optional): metrics for the evaluation session at epoch. The default is None.
 
-        Returns:
-            None
         """
         self.best_model = copy.deepcopy(self.model)
         self.checkpoint = {'epoch': epoch,

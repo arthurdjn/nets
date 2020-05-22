@@ -1,4 +1,4 @@
-from nets.nn.module import Module
+from nets.nn.modules import Module
 from nets.nn.activation import *
 
 

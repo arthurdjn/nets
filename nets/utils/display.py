@@ -1,5 +1,5 @@
 """
-This module defines basic function to render a simulation, like progress bar and statistics table.
+This modules defines basic function to render a simulation, like progress bar and statistics table.
 """
 
 import time

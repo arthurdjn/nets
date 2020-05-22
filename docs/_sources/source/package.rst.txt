@@ -1,0 +1,294 @@
+====
+nets
+====
+
+**NETS** is divided in five main sub-packages:
+
+- `autograd <nets.autograd>`_ refers to the autograd system used,
+
+- `nn <nets.nn>`_ refers to the core of the package, *ie* deep network models,
+
+- `optim <nets.optim>`_ refers to optimizers used during the backpropagation to update weights and biases,
+
+- `data <nets.data>`_ refers to array container, like training and testing examples with their labels,
+
+- `datasets <nets.datasets>`_ refers to popular machine learning libraries for image analysis and NLP.
+
+====
+nets
+====
+
+nets.tensor
+===========
+
+.. automodule:: nets.tensor
+    :members:
+
+nets.numeric
+============
+
+.. automodule:: nets.numeric
+    :members:
+
+nets.functional
+===============
+
+.. automodule:: nets.functional
+    :members:
+
+=============
+nets.autograd
+=============
+
+nets.autograd.functions
+=======================
+
+.. automodule:: nets.autograd.functions
+    :members:
+
+nets.autograd.hook
+==================
+
+.. automodule:: nets.autograd.hook
+    :members:
+
+nets.autograd.numeric
+=====================
+
+.. automodule:: nets.autograd.numeric
+    :members:
+
+nets.autograd.ops
+=================
+
+.. automodule:: nets.autograd.ops
+    :members:
+
+nets.autograd.parameter
+=======================
+
+.. automodule:: nets.autograd.parameter
+    :members:
+
+
+=======
+nets.nn
+=======
+
+The main core of **NETS** is located in **nn** package.
+The neural networks implemented are the most popular ones:
+
+- `Linear Neural Network <nets.nn.linear>`_,
+
+- `Dense Neural Network <nets.nn.dnn>`_,
+
+- `Convolutional Neural Network <nets.nn.cnn>`_,
+
+- `Recurent Neural Network <nets.nn.rnn>`_.
+
+
+nets.nn.activation
+====================
+
+.. automodule:: nets.nn.activation
+    :members:
+
+nets.nn.functional
+==================
+
+.. automodule:: nets.nn.functional
+    :members:
+
+nets.nn.loss
+============
+
+.. automodule:: nets.nn.loss
+    :members:
+
+nets.nn.utils
+=============
+
+.. automodule:: nets.nn.utils
+    :members:
+
+
+===============
+nets.nn.modules
+===============
+
+
+nets.nn.conv
+============
+
+.. automodule:: nets.nn.modules.conv
+    :members:
+
+nets.nn.dnn
+===========
+
+.. automodule:: nets.nn.modules.dnn
+    :members:
+
+nets.nn.dropout
+===============
+
+.. automodule:: nets.nn.modules.dropout
+    :members:
+
+nets.nn.linear
+==============
+
+.. automodule:: nets.nn.modules.linear
+    :members:
+
+nets.nn.module
+==============
+
+.. automodule:: nets.nn.modules.module
+    :members:
+
+nets.nn.pool
+============
+
+.. automodule:: nets.nn.modules.pool
+    :members:
+
+nets.nn.rnn
+===========
+
+.. automodule:: nets.nn.modules.rnn
+    :members:
+
+nets.nn.rnnbase
+===============
+
+.. automodule:: nets.nn.modules.rnnbase
+    :members:
+
+nets.nn.sequential
+==================
+
+.. automodule:: nets.nn.modules.sequential
+    :members:
+
+
+==========
+nets.optim
+==========
+
+nets.optim.optimizer
+====================
+
+.. automodule:: nets.optim.optimizer
+    :members:
+
+nets.optim.adagrad
+==================
+
+.. automodule:: nets.optim.adagrad
+    :members:
+
+nets.optim.adam
+===============
+
+.. automodule:: nets.optim.adam
+    :members:
+
+nets.optim.rmsprop
+==================
+
+.. automodule:: nets.optim.rmsprop
+    :members:
+
+nets.optim.sgd
+==============
+
+.. automodule:: nets.optim.sgd
+    :members:
+
+
+===========
+nets.solver
+===========
+
+nets.solver.solver
+==================
+
+.. automodule:: nets.solver.solver
+    :members:
+
+
+=========
+nets.data
+=========
+
+nets.data.batch
+===============
+
+.. automodule:: nets.data.batch
+    :members:
+
+nets.data.dataset
+=================
+
+.. automodule:: nets.data.dataset
+    :members:
+
+nets.data.example
+=================
+
+.. automodule:: nets.data.example
+    :members:
+
+nets.data.iterator
+==================
+
+.. automodule:: nets.data.iterator
+    :members:
+
+
+=============
+nets.datasets
+=============
+
+nets.datasets.cifar
+===================
+
+.. automodule:: nets.datasets.cifar
+    :members:
+
+nets.datasets.mnist
+===================
+
+.. automodule:: nets.datasets.mnist
+    :members:
+
+nets.datasets.svhn
+==================
+
+.. automodule:: nets.datasets.svhn
+    :members:
+
+
+
+==========
+nets.utils
+==========
+
+nets.utils.display
+==================
+
+.. automodule:: nets.utils.display
+    :members:
+
+nets.utils.errors
+=================
+
+.. automodule:: nets.utils.errors
+    :members:
+
+nets.utils.functions
+====================
+
+.. automodule:: nets.utils.functions
+    :members:

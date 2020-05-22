@@ -1,5 +1,5 @@
 r"""
-This module defines decorators for functions and methods.
+This modules defines decorators for functions and methods.
 """
 
 import functools

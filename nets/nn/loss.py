@@ -7,7 +7,7 @@ another.
 from abc import ABC, abstractmethod
 import numpy as np
 import nets
-from nets.nn.module import Module
+from nets.nn.modules import Module
 
 
 class Loss(Module):

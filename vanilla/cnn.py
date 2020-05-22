@@ -1,11 +1,11 @@
 """
-This module defines a Convolution Neural Network (CNN) naively. This CNN is for test and comparisons purposes.
+This modules defines a Convolution Neural Network (CNN) naively. This CNN is for test and comparisons purposes.
 If you wan to use a more appropriate CNN for your models, use the ``CNN`` instead.
 """
 from abc import ABC
 
 import numpy as np
-from nets.nn.module import Module
+from nets.nn.modules import Module
 from nets import Parameter
 
 

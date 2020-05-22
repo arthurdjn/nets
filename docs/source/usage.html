@@ -1,0 +1,875 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Set Up &mdash; nets 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Creation" href="model.html" />
+    <link rel="prev" title="About" href="getting-started.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pages.github.com/arthurdjn/nets/index.html" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pages.github.com/arthurdjn/nets/source/getting-started.html">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://arthurdujardin.com/projects/nets.html">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pages.github.com/arthurdjn/nets/source/tutorial.html">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pages.github.com/arthurdjn/nets/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/arthurdjn/nets">Github</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+            
+
+            
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+            
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html#instalation">Instalation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Usage</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Set Up</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#example">Example</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Model</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="model.html">Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model.html#evaluation">Evaluation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="package.html">nets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="package.html#id1">nets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="package.html#nets-autograd">nets.autograd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="package.html#nets-nn">nets.nn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="package.html#nets-nn-modules">nets.nn.modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="package.html#nets-optim">nets.optim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="package.html#nets-solver">nets.solver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="package.html#nets-data">nets.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="package.html#nets-datasets">nets.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="package.html#nets-utils">nets.utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>Set Up</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/usage.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="section" id="set-up">
+<h1>Set Up<a class="headerlink" href="#set-up" title="Permalink to this headline">¶</a></h1>
+<p>PyNews introduces basic steps for Natural Language Processing (NLP) analysis.
+First, you may want to clean up the raw data, from <em>The Signal
+Media One-Million News Articles</em> which contains articles from september 2015. This dataset contains Bag of Words (BoW) about 75.000 documents from 20 sources.</p>
+<div class="section" id="data-processing">
+<h2>Data Processing<a class="headerlink" href="#data-processing" title="Permalink to this headline">¶</a></h2>
+<p>The dataset can be found in the <em>data</em> folder, called <em>signal_20_obligatory1_train.tsv.gz</em>.</p>
+<p>The dataset is made of Part of Speech (POS) tags for every words, meaning that the type (“NOUN”, “VERB”, “ADJ” etc.) are stacked on each words with an underscore.
+A first step was then to split the words in half, to keep only the word and not its type.
+Then, the BoW and the vocabulary can be created.</p>
+<p>These functionalities are coded in the <em>pynews.data</em> module.</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">pynews</span> <span class="kn">import</span> <span class="n">NewsDataset</span>
+
+<span class="n">PATH</span> <span class="o">=</span> <span class="s2">&quot;data/signal_20_obligatory1_train.tsv.gz&quot;</span>
+<span class="c1"># Limit of the vocabulary</span>
+<span class="n">VOCAB_SIZE</span> <span class="o">=</span> <span class="mi">3000</span>
+
+<span class="c1"># Create the PyTorch Dataset object from the dataset</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">NewsDataset</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="n">vocab_size</span> <span class="o">=</span> <span class="n">VOCAB_SIZE</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>You can have access to the documents informations from the attributes of the NewsDataset class.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="go"># The shape of the dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(75141, 3000)</span>
+
+<span class="go"># The classes of the dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">classes</span>
+<span class="go">[&#39;4 Traders&#39;, &#39;App.ViralNewsChart.com&#39;, &#39;BioSpace&#39;, &#39;Bloomberg&#39;, &#39;EIN News&#39;,</span>
+<span class="go"> &#39;Fat Pitch Financials&#39;, &#39;Financial Content&#39;, &#39;Individual.com&#39;,</span>
+<span class="go"> &#39;Latest Nigerian News.com&#39;, &#39;Mail Online UK&#39;, &#39;Market Pulse Navigator&#39;,</span>
+<span class="go"> &#39;Marketplace&#39;, &#39;MyInforms&#39;, &#39;NewsR.in&#39;, &#39;Reuters&#39;, &#39;Town Hall&#39; &#39;Uncova&#39;,</span>
+<span class="go"> &#39;Wall Street Business Network&#39;, &#39;Yahoo! Finance&#39;, &#39;Yahoo! News Australia&#39;]</span>
+
+<span class="go"># The BoW inputs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">input_features</span>
+<span class="go">tensor([[0., 0., 0.,  ..., 0., 0., 0.],</span>
+<span class="go">        [0., 0., 0.,  ..., 0., 0., 0.],</span>
+<span class="go">        [0., 0., 0.,  ..., 0., 0., 0.],</span>
+<span class="go">         ...,</span>
+<span class="go">        [0., 0., 0.,  ..., 0., 0., 0.],</span>
+<span class="go">        [0., 0., 0.,  ..., 0., 0., 0.],</span>
+<span class="go">        [0., 0., 0.,  ..., 0., 0., 0.]])</span>
+
+<span class="go"># The gold classes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">gold_classes</span>
+<span class="go">tensor([16,  0, 12,  ..., 19, 11, 12], dtype=torch.int32)</span>
+</pre></div>
+</div>
+<p>You can now save the vectorizer so your Bag of Words features will always be in the same order.</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">save_vectorizer</span><span class="p">(</span><span class="s2">&quot;vectorizer.pickle&quot;</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>It is recommended to split the dataset in two parts :
+one used to train the model, the other to evaluate and test it.</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Define your split ratio</span>
+<span class="n">SPLIT</span> <span class="o">=</span> <span class="mf">0.9</span>
+
+<span class="n">train_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">SPLIT</span> <span class="o">*</span> <span class="n">dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">dev_size</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">train_size</span>
+
+<span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="p">[</span><span class="n">train_size</span><span class="p">,</span> <span class="n">dev_size</span><span class="p">])</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="training">
+<h2>Training<a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h2>
+<p>Before training the model, divide your dataset in batches and load it with the PyTorch class :</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Divide your data in batches of size BATCH_SIZE</span>
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">32</span>
+
+<span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span>    <span class="o">=</span> <span class="n">train_dataset</span><span class="p">,</span>
+                          <span class="n">batch_size</span> <span class="o">=</span> <span class="n">BATCH_SIZE</span><span class="p">,</span>
+                          <span class="n">shuffle</span>    <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>Then, create your model or use the <em>NewsModel</em> one, and define your loss function and optimizer.</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pynews</span> <span class="kn">import</span> <span class="n">NewsModel</span>
+
+<span class="c1"># Define the hyperparameters</span>
+<span class="n">EPOCHS</span> <span class="o">=</span> <span class="mi">250</span>
+<span class="n">LEARNING_RATE</span> <span class="o">=</span> <span class="mf">0.09</span>
+<span class="n">WEIGHT_DECAY</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+<span class="c1"># Create a Feed Forward neural network</span>
+<span class="c1"># with 3 hidden layers</span>
+<span class="c1"># of 150 neurons each</span>
+<span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">classes</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">NewsModel</span><span class="p">(</span><span class="n">VOCAB_SIZE</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+
+<span class="c1"># Loss function</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+<span class="n">Optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span> <span class="o">=</span> <span class="n">LEARNING_RATE</span><span class="p">,</span> <span class="n">weight_decay</span> <span class="o">=</span> <span class="n">WEIGHT_DECAY</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>You can now train the model with :</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pynews</span> <span class="kn">import</span> <span class="n">Trainer</span>
+
+<span class="c1"># Create your trainer for your model</span>
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">)</span>
+
+<span class="c1"># Run it with the hyper parameters you defined</span>
+<span class="n">train_losses</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">EPOCHS</span><span class="p">,</span> <span class="n">LEARNING_RATE</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>Now that your model is trained, evaluate it on the test dataset.</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Load the dataset</span>
+<span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span>    <span class="o">=</span> <span class="n">test_dataset</span><span class="p">,</span>
+                          <span class="n">batch_size</span> <span class="o">=</span> <span class="n">BATCH_SIZE</span><span class="p">,</span>
+                          <span class="n">shuffle</span>    <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Evaluate the model</span>
+<span class="n">test_accuracy</span><span class="p">,</span> <span class="n">test_predictions</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">,</span> <span class="n">confusion_matrix</span> <span class="o">=</span> <span class="n">eval_func</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+<span class="c1"># Get the per class accuracy</span>
+<span class="n">per_class_accuracy</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="o">.</span><span class="n">diag</span><span class="p">()</span> <span class="o">/</span> <span class="n">confusion_matrix</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># Compute the precision, recall and macro-f1 scores</span>
+<span class="n">precision</span> <span class="o">=</span> <span class="n">precision_score</span><span class="p">(</span><span class="n">test_labels</span><span class="p">,</span> <span class="n">test_predictions</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;macro&#39;</span><span class="p">)</span>
+<span class="n">recall</span> <span class="o">=</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">test_labels</span><span class="p">,</span> <span class="n">test_predictions</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;macro&#39;</span><span class="p">)</span>
+<span class="n">macro_f1</span> <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">test_labels</span><span class="p">,</span> <span class="n">test_predictions</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;macro&#39;</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="go"># Global accuracy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test_accuracy</span>
+<span class="go">0.5281437125748503</span>
+
+<span class="go"># Per class accuracy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">per_class_accuracy</span>
+<span class="go">tensor([0.4314, 0.8500, 0.1333, 0.2852, 0.8547, 0.2279, 0.1297, 0.5329, 0.5388,</span>
+<span class="go">        0.5556, 0.1435, 0.2082, 0.3446, 0.7043, 0.5000, 0.1399, 0.4604, 0.1401,</span>
+<span class="go">        0.3069, 0.4850])</span>
+
+<span class="go"># Precision, recall and macro-F1 scores</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">precision</span>
+<span class="go">0.4126984126984127</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">recall</span>
+<span class="go">0.4944444444444444</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">macro_f1</span>
+<span class="go">0.4358730158730159</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="example">
+<h1>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h1>
+<p>In this example, we will try to predict the source of an unknown document.</p>
+<p>Open your model and the <em>vectorizer.pickle</em> to process the data exactly the same way as the training data.</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch.utils</span> <span class="kn">import</span> <span class="n">data</span>
+
+<span class="c1"># Load your pytorch model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;your_model_path.pt&quot;</span><span class="p">)</span>
+<span class="c1"># Open your vectorizer file</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;vectorizer.pickle&quot;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">text_vectorizer</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>  <span class="c1"># Loading the vectorizer</span>
+</pre></div>
+</td></tr></table></div>
+<p>Download the article from one of the 20 classes used to train the model.
+For example, we will try to predict the source of this article (<a class="reference external" href="https://myinforms.com/banking-real-estate/best-bank-in-canada/">https://myinforms.com/banking-real-estate/best-bank-in-canada/</a>).</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">document</span> <span class="o">=</span>  <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            Best Bank in Canada</span>
+
+<span class="s2">            There was a time when you had to physically haul yourself to the closest branch that your bank was operating out of in the area just so that you could withdraw some money or check the balance remaining in your bank account. With the advent of technology and the widespread percolation of the internet, the banking sector has seen some major changes, which brought about a complete shift in how you store your money and the ways in which you gain access to it. Almost all banks — both large and small — have their own website and web portals where transactions can be carried out by the customers who sign up for these services. This not only makes your life easier, but also gives you a secure way of keeping an eye on your funds.</span>
+<span class="s2">            The main problem that many people face in this context is that there are way too many options available for them to choose from, which can be an overwhelming task to sort through. If you are facing such issues and want some help in finding out what is the Best Bank in Canada for you to choose from, you have found yourself at the right place. During the course of this guide, we will be looking at what online banks really are, why we need them and some of the best options that are available for you — so keep reading!</span>
+
+<span class="s2">            What Are Online Banks?</span>
+<span class="s2">            ‘Online banks’ is a term that is used quite loosely to cover many of the financial institutions that allow you to carry out your banking through internet-based platforms. For example, most regular banks have a dedicated online section where registered users can utilize an electronic payment system to conduct an impressive range of financial transactions, which essentially work in the same way as regular banks. Similarly, there are also a bunch of online only banks that are popping up around the world. While these banks do not have actual physical branches that you can visit to get your work done, you can conduct all your business from the comfort of your home or office by securely logging on to the company’s platform.</span>
+<span class="s2">            While many people were apprehensive about the security aspect of online banks when they were first introduced into the market, such financial institutions have become the base on which our financial transactions are based now. If you are still wondering whether or not online banks are the right way forward for you, the next section will give you a better insight into what are the main advantages associated with using online banks for your transactions.</span>
+
+<span class="s2">            Why Should I Use an Online Bank?</span>
+<span class="s2">            While most people prefer to keep an account in a regular bank at all times, many are starting to experiment by opening accounts in these online banks that minimize face-to-face interactions with bank staff. If you have ever tried online banking, you already know how easy it is to get all your work done sitting in one place when you would otherwise be moving from one counter to the other. The case for online banking is based on a three-pronged approach to its benefits, all three of which will be discussed below in greater detail:</span>
+<span class="s2">            Convenience — First and foremost, online banks give you access to your account from anywhere in the world. You can use your computer, smartphone or tablet to carry out whatever business you have without having to search for ATMs to withdraw money from or physical bank branches to seek out a staff member. How many times has an important task come to your mind only to be pushed back because banking hours were over? That will never be the case with online banking, as you have access to your account round the clock.</span>
+<span class="s2">            Pricing — There are a few conventional banks that will offer you “low-fee” accounts, but in most cases, these accounts will be accompanied by some monthly fees and charges that can really wreak havoc on your pocket over time. When you choose to go for online banking, you don’t just gain access to low-fee options, but also a bunch of different no-fee accounts, the best of which will be discussed in a later section. The rationale behind this is that why should you be paying to gain access to the money you have saved yourself!</span>
+<span class="s2">            Additional Features — Conventional banking doesn’t give you the freedom to deposit cheques through your phone or simply send out an email when you want to send money. With the help of features like mobile deposits and Interac e-transfers, online banks have an edge over the regular banks — and these aren’t the only services you would be able to gain access to!</span>
+
+<span class="s2">            The Best Bank in Canada</span>
+<span class="s2">            There are a bunch of different things that you should be looking at if you want to choose the best online bank for your needs out of the large number that are out there right now. While the pricing offered by one bank may seem very impressive, another one may be able to give you access to special features that suit your individual needs in a better manner. Regardless of what the case may be, here is a list of the best online banks in Canada, along with an emphasis on what they do best so that you can choose one that is more in line with your needs:</span>
+
+<span class="s2">            Tangerine</span>
+<span class="s2">            The first name on the list of the best online banks in Canada is the online-only vertical of the Scotiabank called Tangerine. When it comes to carrying out regular transactions like routine withdrawals, transfers and payment of bills and more, this bank will give you deals and facilities that are way above the industry standard — all for free! While the company does offer a decent 1.15</span><span class="si">% i</span><span class="s2">nterest rate for savings accounts, you can avail the promotional offer that allows you to earn 2.75</span><span class="si">% i</span><span class="s2">nterest on your first savings account with Tangerine for a period of 6 months.</span>
+<span class="s2">            The company also offers a great no-fee chequing account, which will be discussed in greater detail in the next section, as well as a Tangerine Money-Back Credit Card on which you can earn 4% Money-Back Rewards with certain conditions. The best part about this online bank is that there are no annual fees involved when you apply for this chequing account or credit card, which is often an issue with conventional banks and platforms. Finally, Tangerine will go out of its way to help you with any issues with the help of its award-winning customer service that can be availed online, on the phone or through social media.</span>
+
+<span class="s2">            Scotia OnLine</span>
+<span class="s2">            While Tangerine is a great online bank for you to turn to, there is another good option for you if you want a company with more experience. Tangerine’s parent company Scotiabank, one of the “Big 5” banks in the country, has an online interface that allows you to make the most of the bank’s varied features and services. If you are a person who chooses his or her banking institutions in terms of the digital interface that they offer, it doesn’t really get better than Scotia OnLine.</span>
+<span class="s2">            One thing that you need to keep in mind is that you will be expected to pay a monthly service fee, which is the norm for some of the larger conventional banks. This fee can vary from anywhere between $3.95 and $10.95, but if your account has a minimum balance, or if you are a senior citizen or a student, you can get a discount on this monthly fee. The bank is always offering its clients some or the other special promotion in terms of rewards, so even if you aren’t looking actively, you must keep an eye out for these special offers.</span>
+
+<span class="s2">            EQ Bank</span>
+<span class="s2">            As more and more banks and financial institutions switch over from conventional branches and ATMs to online platforms, EQ Bank (a subsidiary of Equitable Bank, one of the larger banking institutions in Canada) has developed a model where you carry out your banking and transactions only through the internet using their web portal and smartphone app. This means that you don’t need to get your hands on a cheque book or a debit card, and can carry out all transactions by moving money between your EQ Bank account and any linked accounts.</span>
+<span class="s2">            If you are ready to get rid of the conventional shackles of banking, you can give EQ Bank a shot because of some of the self-evident benefits that are associated with setting up an account with the company. For example, you will not have to pay any monthly fees or charges when you set up any account with the company. In addition to that, the no-fee EQ Bank Savings Plus Account gives you a 2.30</span><span class="si">% i</span><span class="s2">nterest, which is fairly impressive for the industry. The only downside of opting for an account with EQ Bank is that you won’t get the option of opening a chequing account, which could be a deal breaker for some.</span>
+
+<span class="s2">            RBC Online</span>
+<span class="s2">            Another option for those of you who are looking to open an online account with one of Canada’s “Big 5” banks is RBC Online, the online platform offered by Royal Bank of Canada. RBC Online gives you a wide variety of accounts to choose from, all at different levels and varying fee structures. On average, you can expect yourself to pay anywhere between $4 and $30. This is a great option for those of you who want to bundle up a bunch of different RBC products like investments, mortgage and credit cards and cut down on service charges. However, you will not be able to get any fee waivers by maintaining a minimum account balance, which is otherwise an option with many other similar banks.</span>
+<span class="s2">            All in all, RBC Online is a great option for people who are still pulled towards the sense of security that is associated with traditional banking institutions, but also want to get things done online, for example, paying bills, transferring funds and so on. That being said, you cannot expect the bank to give you any other features or services that make it stand out from the other options.</span>
+
+<span class="s2">            BMO Online</span>
+<span class="s2">            If you are a student, senior or a serving or retired military personnel, you must look at the services offered by another “Big 5” bank in Canada — the Bank of Montreal’s BMO Online service. As is the case with the banks in this category — some of which have been discussed earlier in this section — BMO Online will get you similar standardized features like interest rates that match the industry norm and so on. If you have a Savings Builder Account, for example, you will be able to get anywhere up to 1.6</span><span class="si">% i</span><span class="s2">nterest. The monthly fees charged for the different accounts and services is also pretty standard — between $4 and $30 — but you can avail of a wide range of special discounts that are only made available to students, seniors and armed forces personnel.</span>
+<span class="s2">            While this online platform isn’t really known for its innovative approach to online banking, it will give you the freedom to handle all your financial moves from a well designed web portal and smartphone app, which is essential for online banks.</span>
+
+<span class="s2">            TD Online</span>
+<span class="s2">            If you are looking to open an account with an online bank, you probably already know how important it is to have a well-designed mobile app that lets you take all your financial decisions, transfer of funds as well as bill payments while you are on the go. If a great mobile app is your requirement from an online banking service, Canada’s Toronto-Dominion Bank has an online platform called TD Online, which is virtually unmatched in terms of mobile app performance.</span>
+<span class="s2">            First and foremost, it is important to note that TD Canada Trust is not going to give you anything exceptional when it comes to different account options or related interest rates. However, it does give you the option of setting up a good enough no-fee savings account. The mobile app, which is the real winner with TD Online, is filled with a bunch of attractive features that sets it apart from the mobile apps put in place by the competitors. For example, the app comes with features like TD MySpend, which is a tool designed to ensure that you have a platform to track you spending habits and make improvements to your lifestyle.</span>
+
+<span class="s2">            CIBC Online</span>
+<span class="s2">            The last member of the “Big 5” banks to make it to the list of online banks is the Canadian Imperial Bank of Commerce and its CIBC Online platform. The best part about this bank and its platform is that it has been designed to look into the needs of different people who are all at different stages of their lives. This means that if you are a senior looking to open an account with one of the bigger banks in the country, you can look up CIBC’s five different account types that have been specially tailored to the needs of seniors. These accounts can be regular chequing and savings accounts or full-fledged bundles that get you access to elite-level credit cards or just simply a US dollar account.</span>
+<span class="s2">            More and more seniors feel themselves gravitating towards CIBC because of the sense of security that a big bank offers to people who weren’t born in the internet generation. While there may be tons of newer options on the market, sticking to a well-known name may help them feel more secure.</span>
+
+<span class="s2">            FirstOntario</span>
+<span class="s2">            In this section, we will be deviating from the regular banking institutions to include a credit union — the only one on this part of the list — that gives you options to set up chequing accounts as well as savings accounts that may be free or with small associated charges or fees. With the help of the FirstOntario, you can carry out all the tasks you would traditionally be able to conduct with the others on this list. For example, you can use the banking option with FirstOntario to carry out bank transfers, pay your bills online, withdraw money, conduct Interac e-Transfers and even give out personal cheques.</span>
+<span class="s2">            In addition to all these basics, FirstOntario also gives you access to a bunch of different online tools that set it apart from the others in the field. For example, you can use the FirstOntario features to round up when you make a purchase, automatically saving the balance that remains. This acts like a very helpful saving tool.</span>
+
+<span class="s2">            Simplii Financial</span>
+<span class="s2">            Another online banking option that is affiliated with CIBC is Simplii Financial. This is a bank that gives you the option to conduct all your business without ever having to visit a physical branch because there aren’t any branches at all! This isn’t a platform that gives you a ton of different options when it comes to account types. There are only two types of accounts that you can open — the chequing account and the savings account. The chequing account will be discussed in greater detail in the next section, but both these accounts can be opened without having to pay any monthly fees or charges!</span>
+<span class="s2">            You can do everything from paying bills to transferring funds and making cheque deposits (entirely paperless) with the help of the web and mobile platforms that Simplii Financial offers to its consumers. You can learn more about this in the next section.</span>
+
+<span class="s2">            motusbank</span>
+<span class="s2">            The last name on this list is that of the digital bank set up by another credit union — motusbank by Meridian. Launched not too long ago, this online bank has created waves across Canada because of the wide range of products that it has to offer to its consumers. The positives don’t just end here, as the company also offers interest rates that can help you make better financial decisions. With no annual or monthly fees associated with setting up an account as well as no minimum balance requirement, motusbank is a great option not just for chequing accounts but also if you need a mortgage. The latter is also the main reason why motusbank has made it to this list of the best online banks in Canada. If you are looking for personal loans, a mortgage or opening an account, this is one option that you must consider.</span>
+
+<span class="s2">            Best No-Fee Chequing Accounts</span>
+<span class="s2">            After having looked at the best online banks in Canada, it is time for us to look at the best individual options in front of you when it comes to no-fee chequing account. As opposed to the low-fee options that many regular banks offer to their consumers, these no-fee chequing accounts come without the fear of racking up monthly or yearly fees and charges. For this reason, they are one of the more sought out options for people who want to save some money on such unnecessary expenditure. In the list below, we will briefly touch upon the best no-fee chequing account options for you.</span>
+
+<span class="s2">            Tangerine No-Fee Chequing Account</span>
+<span class="s2">            You may be familiar with the bank that was known as ING Direct. Revamped under the brand name of Tangerine, this is an online only bank that is owned by Scotiabank and was discussed in greater detail in the previous section. Here, we are going to look deeper into the free chequing account that the company offers to its clients, in addition to the high-interest savings account, which is offered at a 2.75% promotional rate. While we will not be going into the details of the high-interest savings account, you should keep reading to find out more about the chequing account.</span>
+<span class="s2">            First and foremost, the chequing account is offered to you without any monthly fees. This means that you can carry out an unlimited number of transactions with this account, without having to worry about a bunch of additional charges. The company also gives you access to 3,500 of Scotiabank’s ATM located across Canada and a total of 44,000 locations across the world. You can handle all your transactions through this well-designed app that the company offers and use their 24/7 phone support in case of any issue. Tangerine also offers interest payments of 0.15% to 0.65</span><span class="si">% o</span><span class="s2">n the account balance, in addition to the free first cheque book that you are entitled to. Keep in mind that you will be charged an inactivity fee of $10 if you account doesn’t have any activity for 12 months.</span>
+
+<span class="s2">            motusbank No-Fee Chequing Account</span>
+<span class="s2">            Another great option for those of you who are seeking out an online bank that will give you a no-fee chequing account is motusbank. Owned by Meridian Credit Union, this is one of the newer entries into the category of online-only banks and gives you a bunch of different options to choose from, as was discussed in the earlier section. While motusbank will give you the option to set up a high-interest savings account, as well as mortgages, personal loans and investments, this section will only focus on the no-fee chequing account that motusbank has to offer to its patrons.</span>
+<span class="s2">            For no monthly account fee and an impressive 0.50</span><span class="si">% i</span><span class="s2">nterest payment on your account balance, this is one of the market leaders when it comes to no-fee accounts by online banks. The company will give you unlimited Interac e-Transfers for free, along with other transactions like debit purchases, withdrawals and bill payments. While this bank also gives you the first cheque book for free, it has only half the number of cheques that Tangerine offers. You also gain access to over 3,700 ATMs all across the country, but keep in mind that there will be an inactivity fee of $30 dollars if the account isn’t used for 12 months.</span>
+
+<span class="s2">            Simplii Financial No-Fee Chequing Account</span>
+<span class="s2">            The next option on the list is the no-fee chequing account offered by the company that was known as PC Financial in the past. Owned by CIBC, Simplii Financial gives you the option of setting up no-fee chequing accounts, high-interest savings, mortgages and so much more so that you can benefit greatly without the fear of additional charges and fees. The no-fee chequing account, which is the main service that will be discussed in this section, comes with no monthly fees — as the name suggests — as well as no minimum balance requirement, which can otherwise act as a hurdle in your path.</span>
+<span class="s2">            If you sign up for the no-fee chequing account by Simplii Financial, you will be able to make the most of the free unlimited transactions that the company offers to its customers. These transactions include everything from debit purchases to bill payments that have been pre-authorized, which solves the problem of recurring bills. Along with access to the thousands of CIBC ATMs across the country, you also get as many free Interac e-Transfers as you want to carry out. A great feature offered by company is the free cheque books and the versatile app that lets you control the account seamlessly. An inactivity fee of $20 will be charged if you don’t carry out any transaction for 2 years.</span>
+
+<span class="s2">            Motive Financial</span>
+<span class="s2">            Canadian Western Bank’s Motive Financial — known as Canadian Direct Financial in the past — also offers two different types of free chequing accounts to its consumer base. The first of these is the Motive Chequing account, while the other is the Motive Cha-Ching Chequing account. In addition to this, the company also gives you the option to enroll for savings accounts, investments and a bunch of other services that can make your life so much easier.</span>
+<span class="s2">            Moving to the Motive Chequing account, which is going to be our main point of discussion under Motive Financial’s offered services, let’s look at some of the distinguishing features. First, there are no monthly or yearly fees associated with setting up this account that allows you an unlimited number of transactions. Not only do you get 0.25</span><span class="si">% i</span><span class="s2">nterest payment on your account balance, you also gain access — for free — to one of the largest ATM networks in the country. You can control your account through an effective and easy to use mobile application and also get your hands on a free cheque book with 50 cheques. The main issue here is that you will be charged a $1 fee for every Interac e-Transfer and an inactivity fee of $20 when you make no transactions for 2 years.</span>
+
+<span class="s2">            Manulife Advantage Account</span>
+<span class="s2">            The final option on this list before we conclude is the Manulife Advantage Account, which is quite different from the others on the list, as it gives you access to features of both a chequing account as well as a savings account. While you will be required to maintain a minimum account balance of $1,000, you can carry out an unlimited amount of transactions like bill payments and Interac e-Transfers, without any fees or charges. In addition to this, you will be able to avail high interest rate payments on your account balance. With access to thousands of ATMs across the country and a smartphone app that allows you to carry out e-Transfers and deposit cheques, you will not be lacking any of the premium features offered by other online banks. As is the case with the others, an inactivity charge — of $20 — will be applicable after you do not carry out any transactions for two years.</span>
+<span class="s2">            As the world moves towards greater technological advancements, there is no aspect of your life that is not touched by the internet — including the banking sector. If you are looking to open an account with a good online bank that isn’t just going to give you a no-fee option but also great customer service combined with a bunch of different features, you can look at the options mentioned above. All in all, the decision will have to be based on your individual needs, as people differ in terms of what they need from an online bank. Regardless, you can be assured that any of the banks mentioned above will strive towards giving you a fantastic experience!</span>
+<span class="s2">            &quot;&quot;&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Extract the Bag of Words features and the vocabulary of the document with the vectorizer.</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># The Bag of Word</span>
+<span class="n">input_features</span> <span class="o">=</span> <span class="n">text_vectorizer</span><span class="o">.</span><span class="n">transform</span><span class="p">([</span><span class="n">document</span><span class="p">])</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="c1"># Converting the numpy array to pytorch tensors</span>
+<span class="n">torch_input_features</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">input_features</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>At this point, you can now predict the source.</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Run the model on the unknown document</span>
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">torch_input_features</span><span class="p">)</span>
+<span class="n">predicted</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># Classes generated by the training processing</span>
+<span class="n">classes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;4 Traders&#39;</span><span class="p">,</span> <span class="s1">&#39;App.ViralNewsChart.com&#39;</span><span class="p">,</span> <span class="s1">&#39;BioSpace&#39;</span><span class="p">,</span> <span class="s1">&#39;Bloomberg&#39;</span><span class="p">,</span> <span class="s1">&#39;EIN News&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;Fat Pitch Financials&#39;</span><span class="p">,</span> <span class="s1">&#39;Financial Content&#39;</span><span class="p">,</span> <span class="s1">&#39;Individual.com&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;Latest Nigerian News.com&#39;</span><span class="p">,</span> <span class="s1">&#39;Mail Online UK&#39;</span><span class="p">,</span> <span class="s1">&#39;Market Pulse Navigator&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;Marketplace&#39;</span><span class="p">,</span> <span class="s1">&#39;MyInforms&#39;</span><span class="p">,</span> <span class="s1">&#39;NewsR.in&#39;</span><span class="p">,</span> <span class="s1">&#39;Reuters&#39;</span><span class="p">,</span> <span class="s1">&#39;Town Hall&#39;</span> <span class="s1">&#39;Uncova&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;Wall Street Business Network&#39;</span><span class="p">,</span> <span class="s1">&#39;Yahoo! Finance&#39;</span><span class="p">,</span> <span class="s1">&#39;Yahoo! News Australia&#39;</span><span class="p">]</span>
+<span class="c1"># Get the name of the predicted class</span>
+<span class="n">predicted_class</span> <span class="o">=</span> <span class="n">classes</span><span class="p">[</span><span class="n">predicted</span><span class="p">]</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">predicted_class</span>
+<span class="go">MyInforms</span>
+</pre></div>
+</div>
+</div>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="model.html" class="btn btn-neutral float-right" title="Creation" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="getting-started.html" class="btn btn-neutral" title="About" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Arthur Dujardin.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">Set Up</a><ul>
+<li><a class="reference internal" href="#data-processing">Data Processing</a></li>
+<li><a class="reference internal" href="#training">Training</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example">Example</a></li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script src="../_static/language_data.js"></script>
+         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for Nets</p>
+          <a class="with-right-arrow" href="https://pages.github.com/arthurdjn/nets/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get beginners tutorials and create state-of-the-art models</p>
+          <a class="with-right-arrow" href="https://pages.github.com/arthurdjn/nets/source/tutorial.html">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Check the GitHub page and contribute to the project</p>
+          <a class="with-right-arrow" href="https://github.com/arthurdjn/nets">View GitHub</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pages.github.com/arthurdjn/nets/index.html" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pages.github.com/arthurdjn/nets/index.html">PyTorch</a></li>
+            <li><a href="https://pages.github.com/arthurdjn/nets/source/getting-started.html">Get Started</a></li>
+            <li><a href="https://arthurdujardin.com/projects/nets.html">Blog</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li><a href="https://pages.github.com/arthurdjn/nets/source/tutorial.html">Tutorials</a></li>
+            <li><a href="https://pages.github.com/arthurdjn/nets/index.html">Docs</a></li>
+            <li><a href="https://github.com/arthurdjn/nets/issues" target="_blank">Github Issues</a></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pages.github.com/arthurdjn/nets/index.html" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pages.github.com/arthurdjn/nets/source/getting-started.html">Get Started</a>
+          </li>
+
+
+          <li>
+            <a href="https://arthurdujardin.com/projects/nets.html">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pages.github.com/arthurdjn/nets/source/tutorial.html">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pages.github.com/arthurdjn/nets/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/arthurdjn/nets">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

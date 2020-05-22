@@ -1,5 +1,5 @@
 """
-This module defines basic transformations on a ``Tensor`` like ``transpose`` or ``reshape``.
+This modules defines basic transformations on a ``Tensor`` like ``transpose`` or ``reshape``.
 """
 
 import numpy as np
@@ -79,7 +79,7 @@ def reshape(t, shape):
 
 
 def pad(t, padding, constant_values=0):
-    r"""Reshape a ``Tensor`` to a bigger size and add a ``padding`` on the side, with a ``0``constant value.
+    r"""Reshape a ``Tensor`` to a bigger size and add a ``padding`` on the side, with a ``0`` constant value.
 
     Args:
         t (Tensor): tensor to transform

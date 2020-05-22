@@ -1,5 +1,5 @@
 """
-This module test all methods within a Tensor.
+This modules test all methods within a Tensor.
 """
 
 import unittest

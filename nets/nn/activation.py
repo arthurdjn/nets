@@ -1,5 +1,5 @@
 r"""
-This module defines all activation function, used in neural networks to add non-linearity from one layer to another.
+This modules defines all activation function, used in neural networks to add non-linearity from one layer to another.
 
 Usage:
 
@@ -40,12 +40,12 @@ Usage:
 """
 
 from nets.autograd.functions import *
-from nets.nn.module import Module
+from nets.nn.modules import Module
 
 
 class Activation(Module):
     r"""
-    An activation module is a transformation that modify its inputs element wise, usually it uses non-linearity
+    An activation modules is a transformation that modify its inputs element wise, usually it uses non-linearity
     functions.
     """
 

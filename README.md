@@ -41,7 +41,7 @@ packages can offer a better experience if installed (saving checkpoints and mode
 
 To install this package from [PyPi](https://pypi.org)
 
-``css
+```css
 $ pip install nets
 ```
 

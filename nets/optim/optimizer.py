@@ -15,11 +15,11 @@ class Optimizer(ABC):
 
     @abstractmethod
     def step(self):
-        """Update the parameters. Should be used only with ``autograd``system"""
+        """Update the parameters. Should be used only with ``autograd`` system"""
         raise NotImplementedError
 
     def zero_grad(self):
-        """Zero grad all parameters contained in ``parameters``attribute.
+        """Zero grad all parameters contained in ``parameters`` attribute.
 
         Returns:
             None

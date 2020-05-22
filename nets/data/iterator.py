@@ -1,5 +1,5 @@
 """
-This module defines how the data should be called from a datasets.
+This modules defines how the data should be called from a datasets.
 This takes into account ``shuffle`` mode.
 """
 

@@ -230,7 +230,7 @@ class Tensor(object):
         return self.data
 
     def sum(self, axis=None):
-        r"""Sum the data along a given axis. If no axis are specified, all values within the ``Tensor``will be summed.
+        r"""Sum the data along a given axis. If no axis are specified, all values within the ``Tensor`` will be summed.
 
         Args:
             axis (int): the index of the axis to sum on.
