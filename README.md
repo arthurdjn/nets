@@ -1,6 +1,7 @@
 [![](https://img.shields.io/readthedocs/lyricsfandom)](https://arthurdjn.github.io/nets/)
 [![](https://img.shields.io/pypi/v/nets)](https://pypi.org/project/nets/)
-![](https://img.shields.io/pypi/status/nets)]
+![](https://img.shields.io/pypi/status/nets)
+[![](https://img.shields.io/website?url=http%3A%2F%2Farthurdujardin.com%2Fproject%2Fnets.html)](arthurdujardin.com/project/nets.html)
 
 ![NETS](img/nets.png)
 
