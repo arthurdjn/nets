@@ -15,11 +15,11 @@ def readme_data():
 find_packages()
 
 setup(name='nets',
-      version='0.1',
+      version='0.0.1',
       description='Neural Network with NumPy.',
       long_description=readme_data(),
       long_description_content_type="text/markdown",
-      url='https://github.uio.no/arthurd/nets',
+      url='https://github.com/arthurdjn/nets',
       author='Arthur Dujardin',
       author_email='arthur.dujardin@ensg.eu',
       license='Apache License-2.0',
@@ -34,11 +34,11 @@ setup(name='nets',
           #   3 - Alpha
           #   4 - Beta
           #   5 - Production/Stable
-          'Development Status :: 5 - Stable',
+          'Development Status :: 5 - Production/Stable',
 
           # Indicate who your project is intended for
           'Intended Audience :: Developers',
-          'Topic :: Software Development :: Natural Language Processing and Classification',
+          'Topic :: Software Development :: Neural Network with NumPy',
 
           # Pick your license as you wish (should match "license" above)
 
