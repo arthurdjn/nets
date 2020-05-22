@@ -38,7 +38,7 @@ setup(name='nets',
 
           # Indicate who your project is intended for
           'Intended Audience :: Developers',
-          'Topic :: Software Development :: Neural Network with NumPy',
+          'Topic :: Software Development :: Build Tools',
 
           # Pick your license as you wish (should match "license" above)
 

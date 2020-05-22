@@ -257,7 +257,15 @@ which I hope will help students or people who want to learn more about deep lear
 </ul>
 <p>To use this package, clone the repository at <a class="reference external" href="https://github.com/arthurdjn/nets">https://github.com/arthurdjn/nets</a> on your laptop and from the root folder,
 run on the commandline:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="go">git clone https://github.com/arthurdjn/nets</span>
+<span class="go">cd nets</span>
+<span class="go">pip install .</span>
+</pre></div>
+</div>
 <p>Or you can download it directly with pip:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="go">pip install nets</span>
+</pre></div>
+</div>
 <p>This will install the package in your python environment and download all the latest dependencies. You can know use and tweak the parameters of pynews’ models.</p>
 </div>
 <div class="section" id="usage">
@@ -274,6 +282,35 @@ If using the <em>autograd</em> system, no back-propagation need to be added.
 However, if you prefer to manually compute the gradients, you will need to override the backward method.</p>
 <p>Your Model should inherits from the <code class="docutils literal notranslate"><span class="pre">Module</span></code> class and override the forward method.</p>
 <p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nets</span>
+<span class="kn">import</span> <span class="nn">nets.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+<span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create your own model.</span>
+<span class="sd">    The attributes should be your submodels used during the forward pass.</span>
+<span class="sd">    You don&#39;t have to necessary affect the activation function as an attribute,</span>
+<span class="sd">    unless you want to set a manual backward pass.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">):</span>
+        <span class="c1"># Initialization</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span> <span class="c1"># Don&#39;t forget to add this line</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="c1"># Forward pass</span>
+        <span class="n">out1</span> <span class="o">=</span> <span class="n">nets</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer1</span><span class="p">(</span><span class="n">inputs</span><span class="p">))</span>
+        <span class="n">out2</span> <span class="o">=</span> <span class="n">nets</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer2</span><span class="p">(</span><span class="n">out1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer3</span><span class="p">(</span><span class="n">out2</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Let&#39;s check the architecture</span>
+<span class="n">model</span>
+</pre></div>
+</div>
 <blockquote class="sphx-glr-script-out">
 <div><p>Out:</p>
 </div></blockquote>

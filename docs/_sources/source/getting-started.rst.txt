@@ -41,7 +41,7 @@ Instalation
 To use this package, clone the repository at https://github.com/arthurdjn/nets on your laptop and from the root folder,
 run on the commandline:
 
-.. code-block::pycon
+.. code-block:: pycon
 
     git clone https://github.com/arthurdjn/nets
     cd nets
@@ -49,7 +49,7 @@ run on the commandline:
 
 Or you can download it directly with pip:
 
-.. code-block::pycon
+.. code-block:: pycon
 
     pip install nets
 
@@ -81,7 +81,7 @@ Your Model should inherits from the ``Module`` class and override the forward me
 
 Example:
 
-.. code-block::python
+.. code-block:: python
 
     import nets
     import nets.nn as nn
