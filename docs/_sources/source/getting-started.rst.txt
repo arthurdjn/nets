@@ -1,4 +1,4 @@
-.. image:: images/Nets.png
+.. image:: images/nets.png
 
 
 =====
