@@ -1,3 +1,6 @@
+[![](https://img.shields.io/readthedocs/lyricsfandom)](https://arthurdjn.github.io/nets/)
+
+
 ![NETS](img/nets.png)
 
 
