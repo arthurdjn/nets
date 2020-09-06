@@ -1,23 +1,30 @@
+# File: conv.py
+# Creation: Wednesday August 19th 2020
+# Author: Arthur Dujardin
+# Contact: arthur.dujardin@ensg.eu
+#          arthurd@ifi.uio.no
+# --------
+# Copyright (c) 2020 Arthur Dujardin
+
+
 """
-This modules defines a Convolution Neural Network (CNN) naively. This CNN is for test and comparisons purposes.
-If you wan to use a more appropriate CNN for your models, use the ``CNN`` instead.
+This module defines a Convolution Neural Network (CNN).
 """
-from abc import ABC
 
 import numpy as np
-from .module import Module
 import nets
 from nets import Parameter
+from .module import Module
 from ._utils import col2im, im2col
 
 
 class Conv2d(Module):
     r"""
-    Convolutional Neural Networks (CNN) are a class of Neural Networks that use convolution filters.
-    Their particularity is their ability to synthesis information and learn spatial features.
-    They are mainly used in Image Analysis, but are also known as *sliding windows* in Natural Language Processing.
+    Convolutional Neural Networks (CNN) are a class of Neural Networks that uses convolutional filters.
+    Their particularity is their ability to synthesize information and learn spatial features.
+    They are mainly used in Image Analysis, but are also known as *sliding windows* in Natural Language Processing (NLP).
 
-    ``Conv2d`` networks applies a 2-d convolution on a 4-d tensor.
+    ``Conv2d`` network applies a 2D convolution on a 4D tensor.
     """
 
     def __init__(self, in_channels, out_channels, filter_size, stride=1, pad=0):

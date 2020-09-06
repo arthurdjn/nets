@@ -2,7 +2,10 @@ r"""
 Defines basic operations between two tensors, like addition, subtraction, dot product etc.
 """
 
-import numpy as np
+# Basic imports
+import numpy as ops
+
+# NETS package
 import nets
 from .hook import Hook
 
@@ -12,7 +15,7 @@ def sum(t, axis=None, keepdims=False):
 
     .. math::
 
-        \text{sum} = \sum_{idx} t_{idx}
+        \text{sum}(T) = \sum_{idx} t_{idx}
 
     Args:
         t (Tensor): tensor to get the sum from
@@ -32,17 +35,17 @@ def sum(t, axis=None, keepdims=False):
             r"""Update the gradient for the sum operation.
 
             Shape:
-                - inputs (np.ndarray): upstream gradient
-                - outputs (np.ndarray): gradient with shape the same shape as inputs data :math:`T`.
+                - inputs (numpy.ndarray): upstream gradient
+                - outputs (numpy.ndarray): gradient with shape the same shape as inputs data :math:`T`.
             """
             # We need to keep the information on which axis the sum was made (to be broadcasting compatible)
             # We always reshape the gradient in the same axis for back-propagation
             data_keepdims = t.data.sum(axis=axis, keepdims=True)
-            return grad.reshape(data_keepdims.shape) + np.zeros_like(t.data)
+            return grad.reshape(data_keepdims.shape) + ops.zeros_like(t.data)
 
         hooks.append(Hook(t, grad_fn))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def add(t1, t2):
@@ -70,8 +73,8 @@ def add(t1, t2):
             r"""Update the gradient for the addition.
 
             Shape:
-                - inputs (np.ndarray): upstream gradient with shape the same shape as inputs data :math:`T`.
-                - outputs (np.ndarray): downstream gradient with shape the same shape as inputs data :math:`T`.
+                - inputs (numpy.ndarray): upstream gradient with shape the same shape as inputs data :math:`T`.
+                - outputs (numpy.ndarray): downstream gradient with shape the same shape as inputs data :math:`T`.
             """
             # Sum out added dims
             ndims_added = grad.ndim - t1.data.ndim
@@ -90,8 +93,8 @@ def add(t1, t2):
             r"""Update the gradient for the addition.
 
             Shape:
-                - inputs (np.ndarray): upstream gradient with shape the same shape as inputs data :math:`T`.
-                - outputs (np.ndarray): downstream gradient with shape the same shape as inputs data :math:`T`.
+                - inputs (numpy.ndarray): upstream gradient with shape the same shape as inputs data :math:`T`.
+                - outputs (numpy.ndarray): downstream gradient with shape the same shape as inputs data :math:`T`.
             """
             # Sum out added dims
             ndims_added = grad.ndim - t2.data.ndim
@@ -104,7 +107,7 @@ def add(t1, t2):
             return grad
         hooks.append(Hook(t2, grad_fn2))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def neg(t):
@@ -128,7 +131,7 @@ def neg(t):
     if requires_grad:
         hooks.append(Hook(t, lambda grad: -grad))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def sub(t1, t2):
@@ -164,7 +167,7 @@ def multiply(t1, t2):
     """
     t1 = nets.to_tensor(t1)
     t2 = nets.to_tensor(t2)
-    data = np.multiply(t1.data, t2.data)
+    data = ops.multiply(t1.data, t2.data)
     requires_grad = t1.requires_grad or t2.requires_grad
     hooks = []
 
@@ -173,8 +176,8 @@ def multiply(t1, t2):
             r"""Update the gradient from t1 for the the multiplication operation, :math:`grad = grad \times T_2`.
 
             Shape:
-                - inputs (np.ndarray): upstream gradient with shape the same shape as inputs data :math:`T_1`.
-                - outputs (np.ndarray): downstream gradient with shape the same shape as inputs data :math:`T_1`.
+                - inputs (numpy.ndarray): upstream gradient with shape the same shape as inputs data :math:`T_1`.
+                - outputs (numpy.ndarray): downstream gradient with shape the same shape as inputs data :math:`T_1`.
             """
             grad = grad * t2.data
             # Sum out added dims
@@ -194,8 +197,8 @@ def multiply(t1, t2):
             r"""Update the gradient from t2 for the the multiplication operation, :math:`grad = grad \times T_1`.
 
             Shape:
-                - inputs (np.ndarray): upstream gradient with shape the same shape as inputs data :math:`T_2`.
-                - outputs (np.ndarray): downstream gradient with shape the same shape as inputs data :math:`T_2`.
+                - inputs (numpy.ndarray): upstream gradient with shape the same shape as inputs data :math:`T_2`.
+                - outputs (numpy.ndarray): downstream gradient with shape the same shape as inputs data :math:`T_2`.
             """
             grad = grad * t1.data
             # Sum out added dims
@@ -210,7 +213,7 @@ def multiply(t1, t2):
 
         hooks.append(Hook(t2, grad_fn2))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def inverse(t):
@@ -228,6 +231,7 @@ def inverse(t):
     """
     t = nets.to_tensor(t)
     requires_grad = t.requires_grad
+    data = 1 / t.data
     hooks = []
 
     if requires_grad:
@@ -235,14 +239,14 @@ def inverse(t):
             r"""Update the gradient for the inverse operation, :math:`grad = grad \times \frac{-1}{T^2}`.
 
             Shape:
-                - inputs (np.ndarray): upstream gradient.
-                - outputs (np.ndarray): downstream gradient.
+                - inputs (numpy.ndarray): upstream gradient.
+                - outputs (numpy.ndarray): downstream gradient.
             """
             return - 1 / (t.data ** 2) * grad
 
         hooks.append(Hook(t, grad_fn))
 
-    return nets.Tensor(1 / t.data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def div(t1, t2):
@@ -295,7 +299,7 @@ def dot(t1, t2):
 
         hooks.append(Hook(t2, grad_fn2))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def slice(t, indices):
@@ -316,7 +320,7 @@ def slice(t, indices):
     hooks = []
     if requires_grad:
         def grad_fn(grad):
-            bigger_grad = np.zeros_like(t.data)
+            bigger_grad = ops.zeros_like(t.data)
             if grad.shape != bigger_grad.shape:
                 bigger_grad[indices] = grad
             else:
@@ -324,7 +328,7 @@ def slice(t, indices):
             return bigger_grad
         hooks.append(Hook(t, grad_fn))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def gt(t, other):

@@ -1,4 +1,10 @@
-import numpy as np
+# File: example.py
+# Creation: Wednesday August 19th 2020
+# Author: Arthur Dujardin
+# Contact: arthur.dujardin@ensg.eu
+#          arthurd@ifi.uio.no
+# --------
+# Copyright (c) 2020 Arthur Dujardin
 
 
 class Field(object):
@@ -31,9 +37,9 @@ class Field(object):
 class Example(object):
     r"""
     Store a single training / testing example, and store it as an attribute.
-    Highly inspired from PyTorch [example](https://github.com/pytorch/text/blob/master/torchtext/data/example.py)
+    Highly inspired from PyTorch `Example <https://github.com/pytorch/text/blob/master/torchtext/data/example.py>`__.
+    
     """
-
     @classmethod
     def fromlist(cls, values, fields):
         """

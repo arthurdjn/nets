@@ -4,13 +4,15 @@ Loss functions evaluate the precision and correctness of a model's predictions. 
 another.
 """
 
-from abc import ABC, abstractmethod
-import numpy as np
+# Basic imports
+from abc import ABC
+
+# NETS package
 import nets
 from nets.nn.modules import Module
 
 
-class Loss(Module):
+class Loss(Module, ABC):
     r"""A loss function evaluate the correctness of a set of predictions regarding gold-labels.
     The predictions should be un-corrected, *ie* no transformations like ``Softmax`` should have been used before.
     The loss function will do the transformation if necessary.
@@ -18,7 +20,7 @@ class Loss(Module):
     """
 
     def __init__(self):
-        self.history = []
+        super().__init__()
 
     def forward(self, predictions, labels):
         r"""Compute the cross entropy cost function.
@@ -32,15 +34,8 @@ class Loss(Module):
         """
         raise NotImplementedError
 
-    def cost(self):
-        return self.cost_history[-1]
-
-    def correct(self):
-        return self.correct_history[-1]
-
     def __call__(self, *inputs):
         cost = self.forward(*inputs)
-        self.history.append(cost)
         return cost
 
 

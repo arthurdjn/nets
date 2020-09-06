@@ -1,14 +1,35 @@
-[![](https://img.shields.io/readthedocs/lyricsfandom)](https://arthurdjn.github.io/nets/)
-[![](https://img.shields.io/pypi/v/nets)](https://pypi.org/project/nets/)
-![](https://img.shields.io/pypi/status/nets)
-[![](https://img.shields.io/website?url=http%3A%2F%2Farthurdujardin.com%2Fproject%2Fnets.html)](arthurdujardin.com/project/nets.html)
+![python](https://img.shields.io/badge/python-3.7+-blue.svg)
+[![pypi](https://img.shields.io/pypi/v/nets)](https://pypi.org/project/nets/)
+[![status](https://img.shields.io/pypi/status/nets)](https://pypi.org/project/nets/)
+
+[![docs](https://img.shields.io/readthedocs/lyricsfandom)](https://arthurdjn.github.io/nets/)
+[![website](https://img.shields.io/website?url=http%3A%2F%2Farthurdujardin.com%2Fproject%2Fnets.html)](arthurdujardin.com/project/nets.html)
+
 
 ![NETS](img/nets.png)
 
+Table of Content
+---
 
-# Overview
+<!-- TOC -->
 
-### About
+- [1. Overview](#1-overview)
+    - [1.1. About](#11-about)
+    - [1.2. But why ?](#12-but-why-)
+    - [1.3. Requirements](#13-requirements)
+    - [1.4. Installation](#14-installation)
+    - [1.5. Current Status](#15-current-status)
+    - [1.6. Documentation](#16-documentation)
+- [2. Get Started](#2-get-started)
+    - [2.1. Building a model](#21-building-a-model)
+- [3. Notebooks](#3-notebooks)
+- [4. References](#4-references)
+
+<!-- /TOC -->
+
+# 1. Overview
+
+## 1.1. About
 
 **NETS** is a light-weight Deep Learning **Python** package, made using only (mostly) **numpy**.
 This project was first introduced as an assignment at the 
@@ -20,7 +41,7 @@ In addition, the back-propagation and update rules where changed, using a custom
 **NETS** was highly inspired from [PyTorch](https://pytorch.org/) and [TensorFlow](https://www.tensorflow.org/) 
 packages.
 
-### But why ?
+## 1.2. But why ?
 
 **NETS** package has **NO CLAIMS** to shadow already well build deep learning packages like **PyTorch** 
 or **TensorFlow**. Instead, this package was made to understand how all of these libraries work and handle
@@ -29,7 +50,7 @@ As I am going through this *deep* understanding, I found interesting to share
 as much as possible my work, which I hope will help students or people who want to learn more about this subject.
 
 
-### Requirements
+## 1.3. Requirements
 
 All packages within **NETS** are made from scratch, using mainly **numpy**. However, some additional 
 packages can offer a better experience if installed (saving checkpoints and models for example).
@@ -42,7 +63,7 @@ packages can offer a better experience if installed (saving checkpoints and mode
 - **sklearn** (Optional)
 
 
-### Installation
+## 1.4. Installation
 
 To install this package from [PyPi](https://pypi.org)
 
@@ -58,7 +79,7 @@ $ pip install .
 ```
 
 
-### Current Status
+## 1.5. Current Status
 
 | Development                   | Status         | Feature       | 
 |-------------------------------|----------------|---------------|
@@ -72,12 +93,12 @@ $ pip install .
 | Recurrent Neural Network      | in progress    | <ul><li>[x] RNN</li><li>[ ] LSTM</li><li>[ ] GRU</li></ul>
 
 
-### Documentation
+## 1.6. Documentation
 
 The documentation and tutorials are in process and will be released soon. 
 You will find some tutorials and application on how to get started or build a similar package.
 
-# Get Started
+# 2. Get Started
 
 
 **NETS** architecture follows the one from **PyTorch**. 
@@ -86,7 +107,7 @@ wrap your arrays in a ``Tensor`` class to keep track of the gradients, just like
 
 ![NETS](img/xor.gif)
 
-## Building a model
+## 2.1. Building a model
 
 A model is a ``Module``subclass, where biases, weights and parameters transformations are computed.
 All modules have a ``forward`` method, that MUST be overwritten. 
@@ -138,7 +159,7 @@ Model(
 
 Again, this is really similar to what **PyTorch** offers.
 
-# Notebooks
+# 3. Notebooks
 
 * 0 - [Getting Started with NETS](https://github.com/arthurdjn/nets/blob/master/0_Getting_Started_with_NETS.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/arthurdjn/nets/blob/master/0_Getting_Started_with_NETS.ipynb)
 
@@ -157,7 +178,7 @@ Again, this is really similar to what **PyTorch** offers.
     To be released
 
 
-# References
+# 4. References
 
 Here is a list of tutorials and lectures/assignment that helped to develop **NETS**
 

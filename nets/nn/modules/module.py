@@ -21,6 +21,7 @@ class Module(ABC):
     Abstract Module architecture. All models used to transform tensors should extends from this class to benefits
     ``forward`` and ``backward`` propagation rules.
     """
+
     def __init__(self):
         self.training = True
         self._modules = OrderedDict()
@@ -157,4 +158,3 @@ class Module(ABC):
             self._modules[key] = value
         elif isinstance(value, Parameter):
             self._params[key] = value
-

@@ -1,10 +1,22 @@
+# File: cnn.py
+# Creation: Wednesday August 19th 2020
+# Author: Arthur Dujardin
+# Contact: arthur.dujardin@ensg.eu
+#          arthurd@ifi.uio.no
+# --------
+# Copyright (c) 2020 Arthur Dujardin
+
+
 """
 This modules defines a Convolution Neural Network (CNN) naively. This CNN is for test and comparisons purposes.
-If you wan to use a more appropriate CNN for your models, use the ``CNN`` instead.
+If you wan to use a more appropriate CNN for your models, use the ``nn.CNN`` instead.
 """
-from abc import ABC
 
+# Basic imports
+from abc import ABC
 import numpy as np
+
+# NETS package
 from nets.nn.modules import Module
 from nets import Parameter
 
@@ -45,8 +57,7 @@ class CNN(Module):
         num_filters, channels_w, height_w, width_w = weight.shape
 
         # Raise / Errors
-        assert channels_w == channels_x, (
-            "The number of filter channels must be the same as the number of input layer channels")
+        assert channels_w == channels_x, ("The number of filter channels must be the same as the number of input layer channels")
 
         # 1/ Init the output
         height_y = 1 + (height_x + 2 * pad_size - height_w) // stride
@@ -58,8 +69,10 @@ class CNN(Module):
         # Pad the input images
         height_w2 = height_w // 2
         width_w2 = width_w // 2
-        padding = ((0, 0), (0, 0), (height_w2, height_w2), (width_w2, width_w2))
-        input_layer_pad = np.pad(input_layer, pad_width=padding, mode='constant', constant_values=0)
+        padding = ((0, 0), (0, 0), (height_w2, height_w2),
+                   (width_w2, width_w2))
+        input_layer_pad = np.pad(
+            input_layer, pad_width=padding, mode='constant', constant_values=0)
 
         # 3/ For loops...
         for i in range(batch_size):
@@ -70,8 +83,10 @@ class CNN(Module):
                     for p in range(height_y):
                         for q in range(width_y):
                             # Convolution product
-                            sub_image = image[p * stride:p * stride + height_w, q * stride:q * stride + width_w]
-                            output_layer[i, j, p, q] += np.sum(sub_image * kernel)
+                            sub_image = image[p * stride:p * stride +
+                                              height_w, q * stride:q * stride + width_w]
+                            output_layer[i, j, p,
+                                         q] += np.sum(sub_image * kernel)
                 # Add the bias
                 output_layer[i, j, :, :] += bias[j]
 
@@ -98,10 +113,8 @@ class CNN(Module):
         batch_size, channels_x, height_x, width_x = input_layer.shape
         num_filters, channels_w, height_w, width_w = weight.shape
 
-        assert num_filters == channels_y, (
-            "The number of filters must be the same as the number of output layer channels")
-        assert channels_w == channels_x, (
-            "The number of filter channels be the same as the number of input layer channels")
+        assert num_filters == channels_y, ("The number of filters must be the same as the number of output layer channels")
+        assert channels_w == channels_x, ("The number of filter channels be the same as the number of input layer channels")
 
         # 1/ Pad the input images
         height_w2 = height_w // 2
@@ -130,12 +143,13 @@ class CNN(Module):
                         for s in range(width_w):
                             for p in range(height_y):
                                 for q in range(width_y):
-                                    weight_gradient[j, k, r, s] += output_layer_gradient[i, j, p, q] * input_layer_pad[
-                                        i, k, stride * p + r, stride * q + s]
+                                    weight_gradient[j, k, r, s] += output_layer_gradient[i, j, p, q] * \
+                                        input_layer_pad[i, k, stride * p + r, stride * q + s]
 
         # 4/ input gradient
         input_layer_gradient = np.zeros_like(input_layer)
-        input_layer_gradient_pad = np.pad(input_layer_gradient, pad_width=padding, mode='constant', constant_values=0)
+        input_layer_gradient_pad = np.pad(
+            input_layer_gradient, pad_width=padding, mode='constant', constant_values=0)
 
         # Compute the input_layer gradient
         # --> cf jupyter-notebook formula
@@ -152,6 +166,7 @@ class CNN(Module):
                                         output_layer_gradient[i, j, p, q] * weight[j, k, r, s]
 
         # Delete padding
-        input_layer_gradient = input_layer_gradient_pad[:, :, height_w2:-height_w2, width_w2:-width_w2]
+        input_layer_gradient = input_layer_gradient_pad[:,
+                                                        :, height_w2:-height_w2, width_w2:-width_w2]
 
         return input_layer_gradient, weight_gradient, bias_gradient

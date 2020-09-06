@@ -1,3 +1,19 @@
+# File: dnn.py
+# Creation: Wednesday August 19th 2020
+# Author: Arthur Dujardin
+# Contact: arthur.dujardin@ensg.eu
+#          arthurd@ifi.uio.no
+# --------
+# Copyright (c) 2020 Arthur Dujardin
+
+
+"""
+This modules defines a Dense Neural Network (DNN) naively. This DNN is for test and comparisons purposes.
+If you wan to use a more appropriate DNN for your models, use the ``nn.DNN`` instead.
+"""
+
+
+# NETS package
 from nets.nn.modules import Module
 from nets.nn.activation import *
 
@@ -31,7 +47,8 @@ class DNN(Module):
         self.layer_dimensions = layer_dimensions
         self.hidden_dimensions = layer_dimensions[1: -1]
         # Add activation functions
-        assert isinstance(activation_hidden, Activation), "unrecognized activation function type"
+        assert isinstance(activation_hidden,
+                          Activation), "unrecognized activation function type"
         self.activation_hidden = activation_hidden
         self.activation_output = Softmax(axis=1)
         # Add weights and biases
@@ -51,7 +68,8 @@ class DNN(Module):
             mu = 0
             var = 2 / self.layer_dimensions[i]
             sigma = np.sqrt(var)
-            weight_shape = (self.layer_dimensions[i - 1], self.layer_dimensions[i])
+            weight_shape = (
+                self.layer_dimensions[i - 1], self.layer_dimensions[i])
             weight = np.random.normal(loc=mu, scale=sigma, size=weight_shape)
             bias = np.zeros((self.layer_dimensions[i], ))
 
@@ -124,10 +142,9 @@ class DNN(Module):
         """
         # Layers & shape
         depth = len(self.layer_dimensions) - 1
-        # num_classes, batch_size = outputs.shape
         batch_size, num_classes = outputs.shape
         coefficient = 1 / batch_size
-        # 1/ First case : last layer -> output
+        # 1/ First case: last layer -> output
         layer_a = "a_" + str(depth - 1)
         a = self._cache[layer_a]
         Jz = outputs - labels
@@ -136,7 +153,7 @@ class DNN(Module):
         db = coefficient * np.sum(Jz, axis=0)
         self._grad["dw_" + str(depth)] = dw
         self._grad["db_" + str(depth)] = db
-        # 2/ Second case : inside the layers
+        # 2/ Second case: inside the layers
         for i in range(depth - 1, 0, -1):
             # Get the weights and biases
             layer_w = "w_" + str(i + 1)
@@ -151,23 +168,3 @@ class DNN(Module):
             dw = coefficient * np.dot(a.T, Jz)
             self._grad["dw_" + str(i)] = dw
             self._grad["db_" + str(i)] = db
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

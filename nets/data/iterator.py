@@ -1,10 +1,18 @@
+# File: iterator.py
+# Creation: Wednesday August 19th 2020
+# Author: Arthur Dujardin
+# Contact: arthur.dujardin@ensg.eu
+#          arthurd@ifi.uio.no
+# --------
+# Copyright (c) 2020 Arthur Dujardin
+
+
 """
 This modules defines how the data should be called from a datasets.
 This takes into account ``shuffle`` mode.
 """
 
 import numpy as np
-import nets
 from .batch import Batch
 
 

@@ -15,7 +15,7 @@ def append2dict(dict1, *dicts):
     Returns:
         None
 
-    Examples::
+    Examples:
 
         >>> dict1 = {"key1": [], "key2": []}
         >>> dict2 = {"key1": 0, "key1": 1}

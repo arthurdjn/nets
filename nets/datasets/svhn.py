@@ -1,0 +1,2 @@
+class SVHN(object):
+    pass

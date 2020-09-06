@@ -1,14 +1,44 @@
+# File: tensor.py
+# Creation: Wednesday August 19th 2020
+# Author: Arthur Dujardin
+# Contact: arthur.dujardin@ensg.eu
+#          arthurd@ifi.uio.no
+# --------
+# Copyright (c) 2020 Arthur Dujardin
+
+
 """
-Defines tensors for deep learning application. A tensor is multi-dimensional array, similar to ``numpy`` arrays.
+Defines tensors for deep learning application. A tensor is a multi-dimensional array, similar to ``numpy`` arrays.
 """
 
+# Basic imports
 import numpy as np
+import logging
+try:
+    import cupy as cp
+except Exception as error:
+    logging.error(f"Cannot import CuPy. {error}")
+
+# NETS package
 import nets
-from nets.utils import BackwardCallError
-from nets.utils import deprecated
+from nets.cuda import numpy_or_cupy
+from nets.utils import BackwardCallError, deprecated
 
 
-def to_array(arrayable):
+def tensor2string(tensor, prefix="", precision=4, separator=', ', floatmode=None, 
+                  edgeitems=3, threshold=100, max_line_width=100, suppress_small=False):
+    # Representation
+    mod = numpy_or_cupy(tensor)
+    array_str = mod.array_str(tensor.data, 
+                              precision=precision, 
+                              max_line_width=max_line_width, 
+                              suppress_small=suppress_small)
+    # Prefix
+    array_str = f"\n{prefix}".join(array_str.split("\n"))
+    return array_str
+
+
+def to_numpy(arrayable):
     """Convert an object to a ``numpy.ndarray`` if possible.
 
     Args:
@@ -16,6 +46,17 @@ def to_array(arrayable):
 
     Returns:
         numpy.ndarray
+
+    Examples:
+        >>> import numpy as np
+        >>> from nets.tensor import to_numpy
+        >>> from nets import Tensor
+        >>> array = [0, 1, 2, 3, 4, 4, 6, 7, 8, 9]
+        >>> assert isinstance(to_numpy(array), numpy.ndarray)
+            True
+        >>> tensor = Tensor([0, 1, 2, 3, 4, 4, 6, 7, 8, 9])
+        >>> assert isinstance(to_numpy(tensor), numpy.ndarray)
+            True
     """
     if isinstance(arrayable, np.ndarray):
         return arrayable
@@ -23,6 +64,34 @@ def to_array(arrayable):
         return np.array(arrayable.data)
     else:
         return np.array(arrayable)
+
+
+def to_cupy(arrayable):
+    """Convert an object to a ``cupy.ndarray`` if possible.
+
+    Args:
+        arrayable: object to convert
+
+    Returns:
+        cupy.ndarray
+
+    Examples:
+        >>> import cupy as cp
+        >>> from nets.tensor import to_cupy
+        >>> from nets import Tensor
+        >>> array = [0, 1, 2, 3, 4, 4, 6, 7, 8, 9]
+        >>> assert isinstance(to_cupy(array), cp.ndarray)
+            True
+        >>> tensor = Tensor([0, 1, 2, 3, 4, 4, 6, 7, 8, 9])
+        >>> assert isinstance(to_cupy(tensor), cp.ndarray)
+            True
+    """
+    if isinstance(arrayable, cp.ndarray):
+        return arrayable
+    elif isinstance(arrayable, Tensor):
+        return cp.array(arrayable.data)
+    else:
+        return cp.array(arrayable)
 
 
 # TODO: recursively check if Tensor are inside a list, array... and delete nested Tensor.
@@ -34,6 +103,17 @@ def to_tensor(tensorable):
 
     Returns:
         Tensor
+    
+    Example:
+        >>> import numpy as np
+        >>> from nets.tensor import to_tensor
+        >>> from nets import Tensor
+        >>> array = [0, 1, 2, 3, 4, 4, 6, 7, 8, 9]
+        >>> assert isinstance(to_tensor(array), Tensor)
+            True
+        >>> array = np.array([0, 1, 2, 3, 4, 4, 6, 7, 8, 9])
+        >>> assert isinstance(to_tensor(array), Tensor)
+            True
     """
     if isinstance(tensorable, Tensor):
         return tensorable
@@ -42,20 +122,33 @@ def to_tensor(tensorable):
 
 
 class Tensor(object):
-    """A Tensor is a multi dimensional array that track and record previous gradients, creating a dynamic
+    """A Tensor is a multi dimensional array that tracks and records previous gradients, creating a dynamic
     computational graph.
+
+    * :attr:`data` (numpy.ndarray): numpy array of the tensor's data.
+
+    * :attr:`requires_grad` (bool): if ``True``, will save hooks and create a computational graphs from all previous operations
+        leadings to this tensor.
+
+    * :attr:`_hooks` (nets.autograd.Hook): hook(s) leadings to this tensor. Note that this attribute should not be modified manually.
+
+    * :attr:`grad` (float): gradient for this tensor.
+
+    * :attr:`id` (int): id of the tensor, mainly for debug mode.
+
     """
 
     # Objects instance are heavy-weight in Python.
     # Setting slots free memory, and does not keep built-in functions (__builtin__ things)
-    __slots__ = '_data', 'requires_grad', '_hooks', 'grad', '_id'
+    __slots__ = '_data', 'requires_grad', '_hooks', 'grad', '_id', 'device'
 
-    # A global parameter to track how many Tensor have been instantiate.
+    # A global parameter to track how many `Tensor` have been instantiate.
     # This is mainly for debugging and visualization
     _COUNTER = 0
 
-    def __init__(self, data, requires_grad=False, hooks=None):
-        self._data = to_array(data)
+    def __init__(self, data, requires_grad=False, hooks=None, device="cpu"):
+        self.device = device
+        self._data = to_numpy(data)
         self.requires_grad = requires_grad
         self._hooks = hooks or []
         self.grad = None
@@ -105,7 +198,7 @@ class Tensor(object):
     def T(self):
         return nets.transpose(self)
 
-    @deprecated("This version is deprecated since v0.1. Please add a hook through the constructor instead."
+    @deprecated("This version is deprecated since v0.0.1. Please add a hook through the constructor instead."
                 "Note that in next version another method will be created.")
     def register_hook(self, hook):
         """Register a hook to a ``Tensor``
@@ -131,7 +224,7 @@ class Tensor(object):
         return nets.astype(self, new_type)
 
     def detach(self):
-        r"""Unlink the ``Tensor`` to the computational graph.
+        r"""Unlink the ``Tensor`` from the computational graph.
         By calling this method, the attribute ``_hooks`` and ``grad`` are set to their default values,
         ``None``.
 
@@ -148,7 +241,7 @@ class Tensor(object):
         Returns:
             None
         """
-        self.grad = Tensor(np.zeros_like(self.data, dtype=np.float64))
+        self.grad = nets.zeros(self.shape)
 
     def backward(self, grad=None):
         r"""Compute a single backward pass on all ``Tensor`` linked to this one.
@@ -197,8 +290,8 @@ class Tensor(object):
                 hook.tensor.backward(Tensor(backward_grad))
 
         # TODO: handle properly nodes and leaf from different hooks
-        # TODO: maybe add Variable class / is_leaf attributes
-        # TODO: and counter to skip gradients that don't need to be set
+        #?: maybe add Variable class / is_leaf attributes
+        #?: and counter to skip gradients that don't need to be set
 
     def item(self):
         r"""
@@ -275,14 +368,9 @@ class Tensor(object):
         """
         return nets.flatten(self)
 
-    @deprecated("this version does not support autograd. Please use nets.concatenate instead.")
     def append(self, t, axis=0):
         r"""
         Append a value(- or tensor) to a ``Tensor``.
-
-        .. note::
-
-            The operation takes place in-place and does not support autograd.
 
         Args:
             t (scale, Tensor): object to add
@@ -290,19 +378,17 @@ class Tensor(object):
         Returns:
             None
         """
-        data = to_array(self)
-        value = to_array(t)
-        self.data = np.append(data, value, axis=axis)
+        return nets.append(self, t, axis=axis)
 
     def __repr__(self):
-        string_data = np.array2string(self.data,
-                                      prefix="       ",
-                                      precision=4,
-                                      separator=', ',
-                                      floatmode='maxprec_equal',
-                                      edgeitems=3,
-                                      threshold=100,
-                                      max_line_width=100)
+        string_data = tensor2string(self,
+                                    prefix="       ",
+                                    precision=4,
+                                    separator=', ',
+                                    floatmode='maxprec_equal',
+                                    edgeitems=3,
+                                    threshold=100,
+                                    max_line_width=100)
         requires_grad = "" if not self.requires_grad else f", requires_grad={self.requires_grad}"
         return f"Tensor({string_data}{requires_grad})"
 

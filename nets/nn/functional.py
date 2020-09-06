@@ -37,6 +37,3 @@ def dropout(t, prob=0.5):
 # TODO: defines a single convolution filter
 def conv2d(t, filter):
     pass
-
-
-

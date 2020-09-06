@@ -1,9 +1,8 @@
 r"""
-Defines a basic Recurrent Neural Network.
+Defines a vanilla Recurrent Neural Network (RNN).
 """
 
-import copy
-from .rnnbase import RNNBase
+from nets.nn.modules.rnnbase import RNNBase
 from nets import Parameter
 import nets
 
@@ -11,7 +10,7 @@ import nets
 # TODO: batch template (batch_size, seq_length, inputs_length)
 class RNN(RNNBase):
     """
-    Recurrent neural network (RNN) is a type of neural network that has been successful in modelling sequential data,
+    Recurrent neural network (RNN) is a type of neural network that has been successful for modelling sequential data,
     e.g. language, speech, protein sequences, etc.
 
     A RNN performs its computations in a cyclic manner, where the same computation is applied to every sample
@@ -40,11 +39,12 @@ class RNN(RNNBase):
         Computes the forward pass of a vanilla RNN.
 
         .. math::
-            \begin{align*}
-                h_{0} &= 0   \\
-                h_t &= \text{tanh}(x \cdot W_{ih} + h_{t-1} \cdot W_{hh} + b_{h})    \\
-                y &= h_t \cdot W_{ho} + b_{o}  \\
-            \end{align*}
+
+            h_{0} = 0
+
+            h_t = \text{tanh}(x W_{ih} + h_{t-1} W_{hh} + b_{h})
+
+            y = h_t W_{ho} + b_{o}
 
 
         Args:
@@ -75,7 +75,6 @@ class RNN(RNNBase):
 
         return outputs, hidden_states
 
-    # TODO: manual backpropagation
     def backward(self, dout):
         """
         Computes the backward pass of a vanilla RNN.
@@ -128,5 +127,3 @@ class RNN(RNNBase):
         self._grads["weight_ho"] = dw_ho
         self._grads["bias_h"] = db_h
         self._grads["bias_o"] = db_o
-
-        return None

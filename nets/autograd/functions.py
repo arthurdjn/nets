@@ -8,7 +8,10 @@ This modules defines more complex operations, and defines the most popular funct
 - relu...
 """
 
-import numpy as np
+# Basic imports
+import numpy as ops
+
+# NETS Package
 import nets
 from .hook import Hook
 
@@ -38,19 +41,19 @@ def where(cond, t1, t2):
     assert t1.shape == t2.shape, f"tensors should have the same shape. Got t1.shape={t1.shape}, t2.shape={t2.shape}"
 
     cond = nets.to_array(cond)
-    data = np.where(cond, t1.data, t2.data)
+    data = ops.where(cond, t1.data, t2.data)
     requires_grad = t1.requires_grad or t2.requires_grad
     hooks = []
     if t1.requires_grad:
         def grad_fn(grad):
-            return grad * np.where(cond, 1, 0)
+            return grad * ops.where(cond, 1, 0)
         hooks.append(Hook(t1, grad_fn))
     if t2.requires_grad:
         def grad_fn(grad):
-            return grad * np.where(cond, 0, 1)
+            return grad * ops.where(cond, 0, 1)
         hooks.append(Hook(t2, grad_fn))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def maximum(t1, t2):
@@ -102,7 +105,7 @@ def pow(t, power):
     if requires_grad:
         hooks.append(Hook(t, lambda grad: grad * power * t.data ** (power - 1)))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def sqrt(t):
@@ -120,14 +123,14 @@ def sqrt(t):
         Tensor
     """
     t = nets.to_tensor(t)
-    data = np.sqrt(t.data)
+    data = ops.sqrt(t.data)
     requires_grad = t.requires_grad
     hooks = []
     # Update the gradient
     if requires_grad:
-        hooks.append(Hook(t, lambda grad: - 1 / (2 * np.sqrt(t.data)) * grad))
+        hooks.append(Hook(t, lambda grad: - 1 / (2 * ops.sqrt(t.data)) * grad))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def exp(t):
@@ -143,14 +146,14 @@ def exp(t):
     Returns:
         Tensor
     """
-    data = np.exp(t.data)
+    data = ops.exp(t.data)
     requires_grad = t.requires_grad
     hooks = []
     # Update the gradient
     if requires_grad:
         hooks.append(Hook(t, lambda grad: grad * data))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def log(t):
@@ -166,14 +169,14 @@ def log(t):
     Returns:
         Tensor
     """
-    data = np.log(t.data)
+    data = ops.log(t.data)
     requires_grad = t.requires_grad
     hooks = []
     # Update the gradient
     if requires_grad:
-        hooks.append(Hook(t, lambda grad: grad * np.divide(1, t.data)))
+        hooks.append(Hook(t, lambda grad: grad * ops.divide(1, t.data)))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def softmax(x, axis=0):
@@ -215,7 +218,7 @@ def tanh(t):
 
     .. image:: images/functional_tanh.png
 
-    Examples::
+    Example:
 
         >>> import nets
         >>> in_array = np.array([-5, 2, 6, -2, 4])
@@ -223,13 +226,13 @@ def tanh(t):
 
     See :class:`~nets.nn.activation.Tanh` for the activation implementation.
     """
-    data = np.tanh(t.data)
+    data = ops.tanh(t.data)
     requires_grad = t.requires_grad
     hooks = []
     if requires_grad:
         hooks.append(Hook(t, lambda grad: grad * (1 - data * data)))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def tanh_prime(x):
@@ -245,14 +248,14 @@ def tanh_prime(x):
 
     .. image:: images/functional_tanh_prime.png
 
-    Examples::
+    Example:
 
         >>> in_array = np.array([-5, 2, 6, -2, 4])
         >>> out_array = tanh(in_array)
 
     See :class:`~nets.nn.activation.Tanh` for the activation implementation.
     """
-    return 1 - np.power(2, np.tanh(x))
+    return 1 - ops.power(2, ops.tanh(x))
 
 
 def sigmoid(x):
@@ -268,7 +271,7 @@ def sigmoid(x):
 
     .. image:: images/functional_sigmoid.png
 
-    Examples::
+    Example:
 
         >>> in_array = np.array([-5, 2, 6, -2, 4])
         >>> out_array = sigmoid(in_array)
@@ -291,7 +294,7 @@ def sigmoid_prime(x):
 
     .. image:: images/functional_sigmoid_prime.png
 
-    Examples::
+    Example:
 
         >>> in_array = np.array([-5, 2, 6, -2, 4])
         >>> out_array = sigmoid_prime(in_array)
@@ -314,9 +317,9 @@ def relu(x):
 
     .. image:: images/functional_relu.png
 
-    Examples::
+    Example:
 
-        >>> in_array = np.array([-5, 2, 6, -2, 4])
+        >>> in_array = ops.array([-5, 2, 6, -2, 4])
         >>> out_array = relu(in_array)
 
     See :class:`~nets.nn.activation.ReLU` for the activation implementation.
@@ -341,7 +344,7 @@ def relu_prime(x):
 
     .. image:: images/functional_relu_prime.png
 
-    Examples::
+    Example:
 
         >>> in_array = np.array([-5, 2, 6, -2, 4])
         >>> out_array = relu_prime(in_array)
@@ -367,7 +370,7 @@ def leaky_relu(x, alpha=0.01):
 
     .. image:: images/functional_leaky_relu.png
 
-    Examples::
+    Example:
 
         >>> in_array = np.array([-5, 2, 6, -2, 4])
         >>> alpha = 0.1
@@ -398,7 +401,7 @@ def leaky_relu_prime(x, alpha=0.01):
 
     .. image:: images/functional_leaky_relu_prime.png
 
-    Examples::
+    Example:
 
         >>> in_array = np.array([-5, 2, 6, -2, 4])
         >>> alpha = 0.1

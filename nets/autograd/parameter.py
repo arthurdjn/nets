@@ -2,7 +2,10 @@
 A parameter is a trainable tensor.
 """
 
-import numpy as np
+# Basic imports
+import numpy as ops
+
+# NETS Package
 from nets.tensor import Tensor
 
 
@@ -15,11 +18,12 @@ class Parameter(Tensor):
     def __init__(self, data=None, shape=None):
         # First check if there are enough information to build the Parameter
         if data is None and shape is None:
-            raise ValueError('you must specify the shape or data to create a Parameter')
+            raise ValueError('You must specify the shape or data '
+                             'to create a `Parameter`.')
 
         # If there is no data, generate data from a uniform distribution
         if shape is not None and data is None:
-            data = np.random.randn(*shape)
+            data = ops.random.randn(*shape)
         # Create the Tensor
         super().__init__(data, requires_grad=True)
 
@@ -36,9 +40,9 @@ class Parameter(Tensor):
         """
         mu = 0
         var = 2 / input_dim
-        sigma = np.sqrt(var)
+        sigma = ops.sqrt(var)
         weight_shape = (input_dim, output_dim)
-        data = np.random.normal(loc=mu, scale=sigma, size=weight_shape)
+        data = ops.random.normal(loc=mu, scale=sigma, size=weight_shape)
         return Parameter(data=data)
 
     @classmethod
@@ -51,7 +55,7 @@ class Parameter(Tensor):
         Returns:
             Parameter
         """
-        return Parameter(data=np.zeros(shape))
+        return Parameter(data=ops.zeros(shape))
 
     @classmethod
     def uniform(cls, shape, low=-1, high=1):
@@ -65,7 +69,7 @@ class Parameter(Tensor):
         Returns:
             Parameter
         """
-        data = np.random.uniform(low, high, shape)
+        data = ops.random.uniform(low, high, shape)
         return Parameter(data=data)
 
     @classmethod
@@ -81,7 +85,7 @@ class Parameter(Tensor):
         Returns:
             Parameter
         """
-        data = np.random.normal(mu, sigma, shape)
+        data = ops.random.normal(mu, sigma, shape)
         return Parameter(data=data)
 
     @classmethod
@@ -100,19 +104,20 @@ class Parameter(Tensor):
             Parameter
         """
         if len(shape) < 2:
-            raise ValueError("only parameters with 2 or more dimensions are supported.")
+            raise ValueError(
+                "only parameters with 2 or more dimensions are supported.")
 
         rows, cols = shape
-        data = np.random.randn(rows, cols)
+        data = ops.random.randn(rows, cols)
 
         if rows < cols:
             data = data.T
 
         # Compute QR factorization
-        q, r = np.linalg.qr(data)
+        q, r = ops.linalg.qr(data)
         # Make Q uniform according to https://arxiv.org/pdf/math-ph/0609050.pdf
-        diag = np.diag(r, 0)
-        sign = np.sign(diag)
+        diag = ops.diag(r, 0)
+        sign = ops.sign(diag)
         q *= sign
 
         if rows < cols:

@@ -2,7 +2,15 @@
 This modules defines basic transformations on a ``Tensor`` like ``transpose`` or ``reshape``.
 """
 
-import numpy as np
+# Basic imports
+import numpy as ops
+import logging
+try:
+    import cupy as cp
+except Exception as error:
+    logging.error(f"CuPy not imported. {error}")
+
+# NETS Package
 import nets
 from .hook import Hook
 from ._utils import numpy_unpad, inv_permutation
@@ -28,7 +36,7 @@ def _T(t):
     if requires_grad:
         hooks.append(Hook(t, lambda grad: grad.T))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def transpose(t, indices=None):
@@ -49,13 +57,13 @@ def transpose(t, indices=None):
     hooks = []
     if requires_grad:
         def grad_fn(grad):
-            indices_back = tuple(inv_permutation(indices))
-            grad = grad.transpose(indices_back)
+            indices_inv = tuple(inv_permutation(indices))
+            grad = grad.transpose(indices_inv)
             return grad
 
         hooks.append(Hook(t, grad_fn))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def reshape(t, shape):
@@ -75,7 +83,7 @@ def reshape(t, shape):
     if requires_grad:
         hooks.append(Hook(t, lambda grad: grad.reshape(t.shape)))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def pad(t, padding, constant_values=0):
@@ -90,13 +98,13 @@ def pad(t, padding, constant_values=0):
         Tensor
     """
     t = nets.to_tensor(t)
-    data = np.pad(t.data, pad_width=padding, constant_values=constant_values)
+    data = ops.pad(t.data, pad_width=padding, constant_values=constant_values)
     requires_grad = t.requires_grad
     hooks = []
     if requires_grad:
         hooks.append(Hook(t, lambda grad: numpy_unpad(grad, padding)))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def max(t, axis=None):
@@ -110,27 +118,27 @@ def max(t, axis=None):
         Tensor
     """
     t = nets.to_tensor(t)
-    data = np.max(t.data, axis=axis)
+    data = ops.max(t.data, axis=axis)
     requires_grad = t.requires_grad
     hooks = []
     if requires_grad:
         def grad_fn(grad):
-            bigger_grad = np.zeros_like(t.data)
+            bigger_grad = ops.zeros_like(t.data)
             if axis is None:
                 # If there is no axis, the argmax is the location of he maximum single element
-                max_indices = np.unravel_index(np.argmax(t.data), t.shape)
+                max_indices = ops.unravel_index(ops.argmax(t.data), t.shape)
                 bigger_grad[max_indices] = grad
             else:
                 # If there is an axis, we reconstruct the bigger matrix by 'rolling' on this axis
-                max_indices = np.argmax(t.data, axis=axis)
-                for i, roll in enumerate(np.rollaxis(bigger_grad, axis)):
+                max_indices = ops.argmax(t.data, axis=axis)
+                for i, roll in enumerate(ops.rollaxis(bigger_grad, axis)):
                     roll += (max_indices == i).astype(int) * grad
 
             return bigger_grad
 
         hooks.append(Hook(t, grad_fn))
 
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def argmax(t, axis=None):
@@ -145,9 +153,9 @@ def argmax(t, axis=None):
     """
     t = nets.to_tensor(t)
     if axis is None:
-        return nets.Tensor(np.unravel_index(np.argmax(t.data), t.shape))
+        return nets.Tensor(ops.unravel_index(ops.argmax(t.data), t.shape))
     else:
-        return nets.Tensor(np.argmax(t.data, axis=axis))
+        return nets.Tensor(ops.argmax(t.data, axis=axis))
 
 
 def flatten(t):
@@ -182,20 +190,20 @@ def concatenate(iterable):
                                            f'Types currently supported are list, tuple.'
     requires_grad = False
     hooks = []
-    data = np.array([])
+    data = ops.array([])
     for idx, t in enumerate(iterable):
         t = nets.to_tensor(t)
         requires_grad = t.requires_grad or requires_grad
         if data.size == 0:
             data = t.data
         else:
-            data = np.concatenate((data, t.data))
+            data = ops.concatenate((data, t.data))
         if t.requires_grad:
             def grad_fn(grad):
                 return grad[idx:idx+t.shape[0]]
 
             hooks.append(Hook(t, grad_fn))
-    return nets.Tensor(data, requires_grad, hooks)
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
 def append(t, value):
@@ -234,6 +242,4 @@ def append(t, value):
             return grad[-1]
         hooks.append(Hook(value, grad_fn))
 
-    return nets.Tensor(data, requires_grad, hooks)
-
-
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
