@@ -39,7 +39,7 @@ Usage:
                [0, 1, 1, 1, 0]])
 """
 
-from nets.autograd.functions import *
+import nets
 from nets.nn.modules import Module
 
 
@@ -88,7 +88,7 @@ class ReLU(Activation):
     """
 
     def __init__(self):
-        super().__init__(relu, relu_prime)
+        super().__init__(nets.relu, nets.relu_prime)
 
 
 class Tanh(Activation):
@@ -114,7 +114,7 @@ class Tanh(Activation):
     """
 
     def __init__(self):
-        super().__init__(tanh, tanh_prime)
+        super().__init__(nets.tanh, nets.tanh_prime)
 
 
 class Softmax(Activation):
@@ -124,7 +124,7 @@ class Softmax(Activation):
     """
 
     def __init__(self, axis=0):
-        super().__init__(softmax, None)
+        super().__init__(nets.softmax, None)
         self.axis = axis
 
     def forward(self, inputs):
@@ -158,7 +158,7 @@ class ReLU(Activation):
     """
 
     def __init__(self):
-        super().__init__(relu, relu_prime)
+        super().__init__(nets.relu, nets.relu_prime)
 
 
 class LeakyReLU(Activation):
@@ -184,7 +184,7 @@ class LeakyReLU(Activation):
     """
 
     def __init__(self):
-        super().__init__(leaky_relu, leaky_relu_prime)
+        super().__init__(nets.leaky_relu, nets.leaky_relu_prime)
 
 
 class Sigmoid(Activation):
@@ -210,4 +210,4 @@ class Sigmoid(Activation):
     """
 
     def __init__(self):
-        super().__init__(sigmoid, sigmoid_prime)
+        super().__init__(nets.sigmoid, nets.sigmoid_prime)
