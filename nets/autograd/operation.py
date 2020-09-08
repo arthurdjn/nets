@@ -1,8 +1,20 @@
+# File: ops.py
+# Creation: Wednesday August 19th 2020
+# Author: Arthur Dujardin
+# Contact: arthur.dujardin@ensg.eu
+#          arthurd@ifi.uio.no
+# --------
+# Copyright (c) 2020 Arthur Dujardin
+
+
 r"""
 Defines basic operations between two tensors, like addition, subtraction, dot product etc.
 """
 
 # Basic imports
+from collections import OrderedDict
+from abc import ABC, abstractmethod
+from nets.cuda import numpy_or_cupy
 import numpy as ops
 
 # NETS package
@@ -10,11 +22,157 @@ import nets
 from .hook import Hook
 
 
-def sum(t, axis=None, keepdims=False):
+class Operation(ABC):
+    def __init__(self, device='cpu'):
+        super(Operation, self).__init__()
+        self.device = device
+        self.tensor_left = None
+        self.tensor_right = None
+
+    @abstractmethod
+    def forward(self, tensor_left, tensor_right, *args, **kwargs):
+        raise NotImplementedError
+
+    @abstractmethod
+    def backward_left(self, grad, *args, **kwargs):
+        raise NotImplementedError
+
+    @abstractmethod
+    def backward_right(self, grad, *args, **kwargs):
+        raise NotImplementedError
+
+    def __call__(self, tensor_left, tensor_right, *args, **kwargs):
+        # Save the inputs in `cache`
+        self.tensor_left =tensor_left
+        self.tensor_right = tensor_right
+        # Result of the operation
+        out = self.forward(tensor_left, tensor_right, *args, **kwargs)
+        # Save `hooks` for autograd
+        if tensor_left.requires_grad:
+            out.register_hook(Hook(tensor_left, self.backward_left))
+        if tensor_right.requires_grad:
+            out.register_hook(Hook(tensor_right, self.backward_right))
+        return out
+
+    def __repr__(self):
+        return f'<Op: {self.__class__.__name__} on {self.device.upper()}>'
+
+
+class Function(ABC):
+    def __init__(self):
+        super(Function, self).__init__()
+        self.tensor = None
+
+    @abstractmethod
+    def forward(self, tensor, *args, **kwargs):
+        raise NotImplementedError
+
+    @abstractmethod
+    def backward(self, grad, *args, **kwargs):
+        raise NotImplementedError
+
+    def __call__(self, tensor, *args, **kwargs):
+        self.tensor = tensor
+        out = self.forward(tensor, *args, **kwargs)
+        if tensor.requires_grad:
+            out.register_hook(Hook(tensor, self.backward))
+        return out
+
+    def __repr__(self):
+        return f'<Op: {self.__class__.__name__}>'
+
+
+class Sum(Function):
+    def __init__(self):
+        super(Sum, self).__init__()
+        self.tensor = None
+
+    def forward(self, tensor, axis=None, keepdims=False):
+        self.tensor = tensor
+        data = tensor.data.sum(axis=axis, keepdims=keepdims)
+        return nets.Tensor(data, requires_grad=tensor.requires_grad, device=tensor.device)
+
+    def backward(self, grad, axis=None, keepdims=False):
+        r"""Update the gradient for the sum operation.
+
+        Shape:
+            - inputs (numpy.ndarray): upstream gradient
+            - outputs (numpy.ndarray): gradient with shape the same shape as inputs data :math:`N`.
+        """
+        # We need to keep the information on which axis the sum was made (to be broadcasting compatible)
+        # We always reshape the gradient in the same axis for back-propagation
+        data_keepdims = self.tensor.sum(axis=axis, keepdims=True)
+        grad = grad.reshape(data_keepdims.shape) + nets.zeros_like(self.tensor)
+        return grad
+
+
+class Add(Operation):
+
+    def forward(self, tensor_left, tensor_right):
+        data = tensor_left.data + tensor_right.data
+        requires_grad = tensor_left.requires_grad or tensor_right.requires_grad
+        device = tensor_left.device
+        return nets.Tensor(data, requires_grad=requires_grad, device=device)
+
+    @staticmethod
+    def backward(grad, tensor):
+        r"""Update the gradient for the addition.
+
+        Shape:
+            - inputs (Tensor): upstream gradient with shape the same shape as inputs data :math:`N`.
+            - outputs (Tensor): downstream gradient with shape the same shape as inputs data :math:`N`.
+        """
+        # Sum out added dims
+        ndims_added = grad.ndim - tensor.data.ndim
+        for _ in range(ndims_added):
+            grad = grad.sum(axis=0)
+        # Sum across broadcasted (but non-added dims)
+        for i, dim in enumerate(tensor.shape):
+            if dim == 1:
+                grad = grad.sum(axis=i, keepdims=True)
+        return grad
+        
+    def backward_left(self, grad):
+        grad = self.backward(grad, self.tensor_left)
+        return grad
+
+    def backward_right(self, grad):
+        grad = self.backward(grad, self.tensor_right)
+        return grad
+
+
+class Reshape(Function):
+
+    def __init__(self, shape):
+        self.shape = shape
+
+    def forward(self, tensor):
+        data = tensor.data.reshape(self.shape)
+        return nets.Tensor(data, requires_grad=tensor.requires_grad, device=tensor.device)
+
+    def backward(self, grad):
+        return grad.reshape(self.tensor.shape)
+
+
+def reshape(tensor, shape):
+    r"""Reshape a ``Tensor``.
+
+    Args:
+        t (Tensor): tensor to transform
+        shape (tuple): new shape of ``t``
+
+    Returns:
+        Tensor
+    """
+    func = Reshape(shape)
+    out = func(tensor)
+    return out
+
+
+def sum(tensor, axis=None, keepdims=False):
     r"""Compute the sum of all elements in a tensor, and update the gradients and hooks.
 
     .. math::
-
         \text{sum}(T) = \sum_{idx} t_{idx}
 
     Args:
@@ -26,33 +184,15 @@ def sum(t, axis=None, keepdims=False):
     Returns:
         Tensor: summed tensor
     """
-    data = t.data.sum(axis=axis, keepdims=keepdims)
-    requires_grad = t.requires_grad
-    hooks = []
-    # Update the hooks and gradients
-    if requires_grad:
-        def grad_fn(grad):
-            r"""Update the gradient for the sum operation.
-
-            Shape:
-                - inputs (numpy.ndarray): upstream gradient
-                - outputs (numpy.ndarray): gradient with shape the same shape as inputs data :math:`T`.
-            """
-            # We need to keep the information on which axis the sum was made (to be broadcasting compatible)
-            # We always reshape the gradient in the same axis for back-propagation
-            data_keepdims = t.data.sum(axis=axis, keepdims=True)
-            return grad.reshape(data_keepdims.shape) + ops.zeros_like(t.data)
-
-        hooks.append(Hook(t, grad_fn))
-
-    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+    op_sum = Sum()
+    out = op_sum(tensor, axis=axis, keepdims=keepdims)
+    return out
 
 
-def add(t1, t2):
+def add(tensor1, tensor2):
     r"""Add two tensor-like together.
 
     .. math::
-
         T_{out} = T_1 + T_2
 
     Args:
@@ -62,59 +202,15 @@ def add(t1, t2):
     Returns:
         Tensor: the sum of two Tensor-like object
     """
-    t1 = nets.to_tensor(t1)
-    t2 = nets.to_tensor(t2)
-    data = t1.data + t2.data
-    requires_grad = t1.requires_grad or t2.requires_grad
-    hooks = []
-    # Update the hooks and gradients from t1
-    if t1.requires_grad:
-        def grad_fn1(grad):
-            r"""Update the gradient for the addition.
-
-            Shape:
-                - inputs (numpy.ndarray): upstream gradient with shape the same shape as inputs data :math:`T`.
-                - outputs (numpy.ndarray): downstream gradient with shape the same shape as inputs data :math:`T`.
-            """
-            # Sum out added dims
-            ndims_added = grad.ndim - t1.data.ndim
-            for _ in range(ndims_added):
-                grad = grad.sum(axis=0)
-            # Sum across broadcasted (but non-added dims)
-            for i, dim in enumerate(t1.shape):
-                if dim == 1:
-                    grad = grad.sum(axis=i, keepdims=True)
-            return grad
-        hooks.append(Hook(t1, grad_fn1))
-
-    # Update the hooks and gradients from t2
-    if t2.requires_grad:
-        def grad_fn2(grad):
-            r"""Update the gradient for the addition.
-
-            Shape:
-                - inputs (numpy.ndarray): upstream gradient with shape the same shape as inputs data :math:`T`.
-                - outputs (numpy.ndarray): downstream gradient with shape the same shape as inputs data :math:`T`.
-            """
-            # Sum out added dims
-            ndims_added = grad.ndim - t2.data.ndim
-            for _ in range(ndims_added):
-                grad = grad.sum(axis=0)
-            # Sum across broadcasted (but non-added dims)
-            for i, dim in enumerate(t2.shape):
-                if dim == 1:
-                    grad = grad.sum(axis=i, keepdims=True)
-            return grad
-        hooks.append(Hook(t2, grad_fn2))
-
-    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+    op_add = Add()
+    out = op_add(tensor1, tensor2)
+    return out
 
 
 def neg(t):
     r"""Oppose the values of a tensor.
 
     .. math::
-
         T_{out} = - T
 
     Args:
@@ -138,7 +234,6 @@ def sub(t1, t2):
     r"""Subtract two tensor-like object
 
     .. math::
-
         T_{out} = T_1 - T_2
 
     Args:
@@ -155,7 +250,6 @@ def multiply(t1, t2):
     r"""Elementwise multiplication of two tensors-like object.
 
     .. math::
-
         T_{out} = T_1 \times T_2
 
     Args:
@@ -270,9 +364,9 @@ def div(t1, t2):
 
 def dot(t1, t2):
     r"""Dot product of two matrices.
-    
+
     .. math::
-    
+
         T_{out} = (t_{i, j}^{[out]})_{i, j} \quad where \quad t_{i, j}^{[out]} = \sum_{k=1}^{n} t_{i, k}^{[1]} \times
         t_{k, j}^{[2]}
 
@@ -326,6 +420,7 @@ def slice(t, indices):
             else:
                 bigger_grad = grad
             return bigger_grad
+
         hooks.append(Hook(t, grad_fn))
 
     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)

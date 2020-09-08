@@ -66,26 +66,6 @@ def transpose(t, indices=None):
     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
 
 
-def reshape(t, shape):
-    r"""Reshape a ``Tensor``.
-
-    Args:
-        t (Tensor): tensor to transform
-        shape (tuple): new shape of ``t``
-
-    Returns:
-        Tensor
-    """
-    t = nets.to_tensor(t)
-    data = t.data.reshape(shape)
-    requires_grad = t.requires_grad
-    hooks = []
-    if requires_grad:
-        hooks.append(Hook(t, lambda grad: grad.reshape(t.shape)))
-
-    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
-
-
 def pad(t, padding, constant_values=0):
     r"""Reshape a ``Tensor`` to a bigger size and add a ``padding`` on the side, with a ``0`` constant value.
 

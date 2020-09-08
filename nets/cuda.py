@@ -20,13 +20,14 @@ def numpy_or_cupy(*tensors):
         module
     """
     module = __import__("numpy")
-    devices = [tensor.device == 'cuda' for tensor in tensors]
+    devices = [t.device == 'cuda' for t in tensors]
     if np.mean(devices) == 1:
         try:
             return __import__("cupy")
         except Exception as error:
-            logging.error(f"CuPy not imported. {error}")
+            logging.error(f"CuPy is not imported. ERROR: {error}")
     elif np.mean(devices) == 0:
         return module
     else:
-        logging.error("Cannot compute from tensors on different devices.")
+        logging.error(f"Cannot compute from tensors on different devices. "
+                      f"Got {', '.join([t.device for t in tensors])}.")

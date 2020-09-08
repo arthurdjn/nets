@@ -30,13 +30,13 @@ class Module(ABC):
         self._cache = OrderedDict()
 
     @abstractmethod
-    def forward(self, *inputs):
+    def forward(self, *inputs, **kwargs):
         """One forward step. Gradients and outputs should be saved in the ``_cache`` when training, to be able to
         perform the backward pass.
         """
         raise NotImplementedError
 
-    def backward(self, *outputs):
+    def backward(self, *outputs, **kwargs):
         """One backward step."""
         raise NotImplementedError
 
@@ -147,8 +147,8 @@ class Module(ABC):
                 string += f"\n{tab}({key}): {module.get_name()}({module.inner_repr()})"
         return f'{string}\n)'
 
-    def __call__(self, *inputs):
-        return self.forward(*inputs)
+    def __call__(self, *inputs, **kwargs):
+        return self.forward(*inputs, **kwargs)
 
     def __setattr__(self, key, value):
         # First initialize the attribute we want to add

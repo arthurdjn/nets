@@ -47,7 +47,7 @@ def to_numpy(arrayable):
     Returns:
         numpy.ndarray
 
-    Examples:
+    Example:
         >>> import numpy as np
         >>> from nets.tensor import to_numpy
         >>> from nets import Tensor
@@ -75,7 +75,7 @@ def to_cupy(arrayable):
     Returns:
         cupy.ndarray
 
-    Examples:
+    Example:
         >>> import cupy as cp
         >>> from nets.tensor import to_cupy
         >>> from nets import Tensor
@@ -140,15 +140,20 @@ class Tensor(object):
 
     # Objects instance are heavy-weight in Python.
     # Setting slots free memory, and does not keep built-in functions (__builtin__ things)
-    __slots__ = '_data', 'requires_grad', '_hooks', 'grad', '_id', 'device'
+    __slots__ = '_data', 'requires_grad', '_hooks', 'grad', '_id', '_device'
 
     # A global parameter to track how many `Tensor` have been instantiate.
     # This is mainly for debugging and visualization
     _COUNTER = 0
 
     def __init__(self, data, requires_grad=False, hooks=None, device="cpu"):
-        self.device = device
-        self._data = to_numpy(data)
+        self._device = device
+        # Load the data to the right device (either CPU or GPU)
+        if device == 'cpu':
+            data = to_numpy(data)
+        else:
+            data = to_cupy(data)
+        self._data = data
         self.requires_grad = requires_grad
         self._hooks = hooks or []
         self.grad = None
@@ -158,6 +163,10 @@ class Tensor(object):
 
         if self.requires_grad:
             self.zero_grad()
+
+    @property
+    def device(self):
+        return self._device
 
     @property
     def data(self):
@@ -198,8 +207,6 @@ class Tensor(object):
     def T(self):
         return nets.transpose(self)
 
-    @deprecated("This version is deprecated since v0.0.1. Please add a hook through the constructor instead."
-                "Note that in next version another method will be created.")
     def register_hook(self, hook):
         """Register a hook to a ``Tensor``
 
@@ -241,7 +248,7 @@ class Tensor(object):
         Returns:
             None
         """
-        self.grad = nets.zeros(self.shape)
+        self.grad = nets.zeros(self.shape, device=self.device)
 
     def backward(self, grad=None):
         r"""Compute a single backward pass on all ``Tensor`` linked to this one.
@@ -258,7 +265,6 @@ class Tensor(object):
             None
 
         .. note::
-
             To be able to back-propagate, the top-level ``Tensor`` must have ``requires_grad`` set to ``True``
             to propagate the gradient.
         """
@@ -272,7 +278,7 @@ class Tensor(object):
                                     r"`requires_grad` was not specified.")
         if grad is None:
             if self.shape == ():
-                grad = Tensor(1.0)
+                grad = Tensor(1.0, device=self.device)
             else:
                 raise RuntimeError("grad must be specified for non-0-tensor")
 
@@ -284,10 +290,10 @@ class Tensor(object):
         hooks = self._hooks
         if hooks is not None:
             for hook in self._hooks:
-                # Compute the gradient wrt the operation
-                backward_grad = hook.grad_fn(grad.data)
+                # Compute the gradient w.r.t the operation
+                backward_grad = hook.grad_fn(grad)
                 # Back-propagate in the tensor used in this operation
-                hook.tensor.backward(Tensor(backward_grad))
+                hook.tensor.backward(backward_grad)
 
         # TODO: handle properly nodes and leaf from different hooks
         #?: maybe add Variable class / is_leaf attributes
@@ -322,7 +328,7 @@ class Tensor(object):
         self.detach()
         return self.data
 
-    def sum(self, axis=None):
+    def sum(self, axis=None, keepdims=False):
         r"""Sum the data along a given axis. If no axis are specified, all values within the ``Tensor`` will be summed.
 
         Args:
@@ -331,7 +337,7 @@ class Tensor(object):
         Returns:
             Tensor
         """
-        return nets.sum(self, axis)
+        return nets.sum(self, axis=axis, keepdims=keepdims)
 
     def transpose(self, *indices):
         r"""Transpose the ``Tensor``. The operation is not in-place.
@@ -344,7 +350,7 @@ class Tensor(object):
         """
         return nets.transpose(self, indices)
 
-    def reshape(self, *shapes):
+    def reshape(self, shape):
         r"""Reshape a ``Tensor`` with a new shape. The transformation is not made in-place.
 
         .. note::
@@ -358,7 +364,7 @@ class Tensor(object):
         Returns:
             Tensor
         """
-        return nets.reshape(self, shapes)
+        return nets.reshape(self, shape)
 
     def flatten(self):
         r"""Flatten a ``Tensor`` with a new shape. The transformation is not made in-place.
