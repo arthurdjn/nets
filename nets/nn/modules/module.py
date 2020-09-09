@@ -118,6 +118,24 @@ class Module(ABC):
         with open(filename, 'w') as f:
             json.dump(state, f)
 
+    def cpu(self):
+        """Move the location of the tensor to the CPU.
+
+        Returns:
+            Tensor
+        """
+        for parameter in self.parameters():
+            parameter.cpu()
+
+    def cuda(self):
+        """Move the location of the tensor to the GPU.
+
+        Returns:
+            Tensor
+        """
+        for parameter in self.parameters():
+            parameter.cuda()
+
     def get_name(self):
         """Quick access to get the name of a modules.
 

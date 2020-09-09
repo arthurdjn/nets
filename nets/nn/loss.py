@@ -78,7 +78,7 @@ class CrossEntropyLoss(Loss):
         assert labels.dtype == int, "unsupported labels type {} for cross entropy loss".format(predictions.dtype)
         batch_size, _ = predictions.shape
         predictions = nets.softmax(predictions, axis=1)
-        cost = - 1 / batch_size * nets.sum(nets.log(predictions) * labels)
+        cost = nets.Tensor(- 1 / batch_size, device=predictions.device) * nets.sum(nets.log(predictions) * labels)
         return cost
 
     def backward(self, predictions, labels):

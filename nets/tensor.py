@@ -59,10 +59,12 @@ def to_numpy(arrayable):
         >>> assert isinstance(to_numpy(tensor), numpy.ndarray)
             True
     """
-    if isinstance(arrayable, np.ndarray):
-        return arrayable
-    elif isinstance(arrayable, Tensor):
+    if isinstance(arrayable, Tensor):
         return np.array(arrayable.data)
+    elif isinstance(arrayable, np.ndarray):
+        return arrayable
+    elif isinstance(arrayable, cp.ndarray):
+        return cp.asnumpy(arrayable)
     else:
         return np.array(arrayable)
 
@@ -87,43 +89,14 @@ def to_cupy(arrayable):
         >>> assert isinstance(to_cupy(tensor), cp.ndarray)
             True
     """
-    if isinstance(arrayable, cp.ndarray):
-        return arrayable
-    elif isinstance(arrayable, Tensor):
+    if isinstance(arrayable, Tensor):
         return cp.array(arrayable.data)
-    else:
+    elif isinstance(arrayable, np.ndarray):
         return cp.array(arrayable)
-
-
-def to_array(arrayable):
-    """Convert an object to a ``cupy.ndarray`` if possible.
-
-    Args:
-        arrayable: object to convert
-
-    Returns:
-        cupy.ndarray
-
-    Example:
-        >>> import cupy as cp
-        >>> from nets.tensor import to_cupy
-        >>> from nets import Tensor
-        >>> array = [0, 1, 2, 3, 4, 4, 6, 7, 8, 9]
-        >>> assert isinstance(to_cupy(array), cp.ndarray)
-            True
-        >>> tensor = Tensor([0, 1, 2, 3, 4, 4, 6, 7, 8, 9])
-        >>> assert isinstance(to_cupy(tensor), cp.ndarray)
-            True
-    """
-    if isinstance(arrayable, np.ndarray):
-        return arrayable
     elif isinstance(arrayable, cp.ndarray):
         return arrayable
-    elif isinstance(arrayable, Tensor):
-        if arrayable.device == 'cpu':
-            return np.array(arrayable.data)
-        return cp.array(arrayable.data)
-    return np.array(arrayable)
+    else:
+        return cp.array(arrayable)
 
 
 # TODO: recursively check if Tensor are inside a list, array... and delete nested Tensor.
@@ -198,7 +171,7 @@ class Tensor(object):
 
     @property
     def device(self):
-        return self._device
+        return self._device.lower()
 
     @property
     def data(self):
@@ -331,6 +304,35 @@ class Tensor(object):
         # ?: maybe add Variable class / is_leaf attributes
         # ?: and counter to skip gradients that don't need to be set
 
+    def to(self, device):
+        """Change the device where the tensor is located.
+
+        Args:
+            device (str): Name of the device to save the tensor. Options are ``'cuda'`` or ``'cpu'``.
+
+        Returns:
+            Tensor
+        """
+        return Tensor(self.data, requires_grad=self.requires_grad, device=device)
+
+    def cpu(self):
+        """Move the location of the tensor to the CPU.
+
+        Returns:
+            Tensor
+        """
+        self.data = self.to('cpu').data
+        self._device = 'cpu'
+
+    def cuda(self):
+        """Move the location of the tensor to the GPU.
+
+        Returns:
+            Tensor
+        """
+        self.data = self.to('cuda').data
+        self._device = 'cuda'
+
     def item(self):
         r"""
         Get the item (float, int etc.) of a 0-dimensional ``Tensor``. It will detach the tensor from the computational
@@ -358,7 +360,16 @@ class Tensor(object):
             numpy.ndarray
         """
         self.detach()
-        return self.data
+        return to_numpy(self.data)
+
+    def cupy(self):
+        r"""Convert the ``Tensor`` data to a ``numpy.ndarray`` object.
+
+        Returns:
+            numpy.ndarray
+        """
+        self.detach()
+        return to_cupy(self.data)
 
     def sum(self, axis=None, keepdims=False):
         r"""Sum the data along a given axis. If no axis are specified, all values within the ``Tensor`` will be summed.
@@ -387,7 +398,7 @@ class Tensor(object):
 
         .. note::
 
-            The new shape **must** have the same size of the actual shape.
+            The new shape must have the same size of the actual shape.
             If its not the case, the reshape method will raise an error.
 
         Args:
@@ -428,7 +439,7 @@ class Tensor(object):
                                     threshold=100,
                                     max_line_width=100)
         requires_grad = "" if not self.requires_grad else f", requires_grad={self.requires_grad}"
-        return f"Tensor({string_data}{requires_grad}, device={self.device})"
+        return f"Tensor({string_data}{requires_grad}, <{self.device.lower()}>)"
 
     def __len__(self):
         return len(self.data)

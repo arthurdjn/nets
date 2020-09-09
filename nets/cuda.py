@@ -31,3 +31,8 @@ def numpy_or_cupy(*tensors):
     else:
         logging.error(f"Cannot compute from tensors on different devices. "
                       f"Got {', '.join([t.device for t in tensors])}.")
+
+
+def scalar_to_device(tensor, scalar):
+    if scalar.shape == () and tensor.device != 'cpu':
+        scalar.cuda()

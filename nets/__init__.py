@@ -1,5 +1,5 @@
 # Main package
-from nets.tensor import Tensor, to_numpy, to_cupy, to_array, to_tensor, tensor2string
+from nets.tensor import Tensor, to_numpy, to_cupy, to_tensor, tensor2string
 from nets.numeric import *
 
 from nets.autograd import Hook, Parameter
