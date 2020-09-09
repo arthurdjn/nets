@@ -6,6 +6,8 @@
 # --------
 # Copyright (c) 2020 Arthur Dujardin
 
+# Basic imports
+import numpy as np
 
 # NETS package
 from nets.cuda import numpy_or_cupy
@@ -25,19 +27,8 @@ def transpose(t, indices=None):
         Tensor
     """
     t = nets.to_tensor(t)
-    if indices is None:
-        indices = tuple(range(t.ndim - 1, -1, -1))
-    data = t.data.transpose(indices)
-    tensor = nets.Tensor(data, requires_grad=t.requires_grad, device=t.device)
-    
-    if t.requires_grad:
-        def grad_fn(grad):
-            indices_back = tuple(nets.autograd.utils.inv_permutation(indices))
-            grad = grad.transpose(indices_back)
-            return grad
-        tensor.register_hook(nets.Hook(t, grad_fn))
-    
-    return tensor
+    func = fc.Transpose(indices)
+    return func(t)
 
 
 def reshape(t, shape):
@@ -125,10 +116,12 @@ def argmax(t, axis=None):
         Tensor
     """
     t = nets.to_tensor(t)
+    nc = numpy_or_cupy(t)
     if axis is None:
-        return nets.Tensor(nets.unravel_index(argmax(t.data), t.shape))
+        data = nc.unravel_index(nc.argmax(t.data), t.shape)
     else:
-        return nets.Tensor(nets.argmax(t.data, axis=axis))
+        data = nc.argmax(t.data, axis=axis)
+    return nets.Tensor(data, device=t.device)
 
 
 def neg(t):
@@ -262,41 +255,28 @@ def div(t1, t2):
     return multiply(t1, inverse(t2))
 
 
-def dot(t1, t2):
-    r"""Dot product of two matrices.
+# # # def dot(t1, t2):
+# # #     r"""Dot product of two matrices.
 
-    .. math::
-        \begin{*align}
-            \text{dot}(t1, t2)  &= t_{out}
-                                &= t_1 \dot t_2 \\
-            \quad where \quad t_{i, j}^{[out]} = \sum_{k=1}^{n} t_{i, k}^{[1]} \times
-            t_{k, j}^{[2]}
-        \end{*align}
+# # #     .. math::
+# # #         \begin{*align}
+# # #             \text{dot}(t1, t2)  &= t_{out}
+# # #                                 &= t_1 \dot t_2 \\
+# # #             \quad where \quad t_{i, j}^{[out]} = \sum_{k=1}^{n} t_{i, k}^{[1]} \times
+# # #             t_{k, j}^{[2]}
+# # #         \end{*align}
 
-    Args:
-        t1 (Tensor like): tensor to multiply.
-        t2 (Tensor like): second tensor to multiply with.
+# # #     Args:
+# # #         t1 (Tensor like): tensor to multiply.
+# # #         t2 (Tensor like): second tensor to multiply with.
 
-    Returns:
-        Tensor: the elementwise multiplication.
-    """
-    t1 = nets.to_tensor(t1)
-    t2 = nets.to_tensor(t2)
-    data = t1.data @ t2.data
-    requires_grad = t1.requires_grad or t2.requires_grad
-    tensor = nets.Tensor(data, requires_grad=requires_grad, device=t1.device)
-
-    if t1.requires_grad:
-        def grad_fn1(grad):
-            return grad @ t2.T
-        tensor.register_hook(nets.Hook(t1, grad_fn1))
-
-    if t2.requires_grad:
-        def grad_fn2(grad):
-            return t1.T @ grad
-        tensor.register_hook(nets.Hook(t2, grad_fn2))
-
-    return tensor
+# # #     Returns:
+# # #         Tensor: the elementwise multiplication.
+# # #     """
+# # #     t1 = nets.to_tensor(t1)
+# # #     t2 = nets.to_tensor(t2)
+# # #     operation = op.Dot()
+# # #     return operation(t1, t2)
 
 
 def slice(t, indices):
@@ -425,7 +405,7 @@ def log(t):
         Tensor
     """
     t = nets.to_tensor(t)
-    func = fc.Exp()
+    func = fc.Log()
     return func(t)
 
 
@@ -718,3 +698,512 @@ def append(t, value):
         tensor.register_hook(nets.Hook(t, grad_fn))
 
     return tensor
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def numpy_unpad(x, pad_width):
+    """Unpad an array.
+    Args:
+        x (numpy.ndarray): array to unpad
+        pad_width (tuple): padding
+    Returns:
+        numpy.ndarray
+    """
+    slices = []
+    for c in pad_width:
+        e = None if c[1] == 0 else -c[1]
+        slices.append(slice(c[0], e))
+    return x[tuple(slices)]
+
+
+def inv_permutation(permutation):
+    """Get the inverse of a permutation. Used to invert a transposition for example.
+    Args:
+        permutation (list or tuple): permutation to invert.
+    Returns:
+        list
+    """
+    inverse = [0] * len(permutation)
+    for i, p in enumerate(permutation):
+        inverse[p] = i
+    return inverse
+
+
+
+
+
+
+
+
+
+
+
+# def sum(t, axis=None, keepdims=False):
+#     data = t.data.sum(axis=axis, keepdims=keepdims)
+#     requires_grad = t.requires_grad
+#     hooks = []
+#     # Update the hooks and gradients
+#     if requires_grad:
+#         def grad_fn(grad):
+#             # We need to keep the information on which axis the sum was made (to be broadcasting compatible)
+#             # We always reshape the gradient in the same axis for back-propagation
+#             data_keepdims = t.sum(axis=axis, keepdims=True)
+#             return grad.reshape(data_keepdims.shape) + nets.zeros_like(t)
+
+#         hooks.append(nets.Hook(t, grad_fn))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def add(t1, t2):
+#     t1 = nets.to_tensor(t1)
+#     t2 = nets.to_tensor(t2)
+#     data = t1.data + t2.data
+#     requires_grad = t1.requires_grad or t2.requires_grad
+#     hooks = []
+#     # Update the hooks and gradients from t1
+#     if t1.requires_grad:
+#         def grad_fn1(grad):
+#             # Sum out added dims
+#             ndims_added = grad.ndim - t1.ndim
+#             for _ in range(ndims_added):
+#                 grad = grad.sum(axis=0)
+#             # Sum across broadcasted (but non-added dims)
+#             for i, dim in enumerate(t1.shape):
+#                 if dim == 1:
+#                     grad = grad.sum(axis=i, keepdims=True)
+#             return grad
+#         hooks.append(nets.Hook(t1, grad_fn1))
+
+#     # Update the hooks and gradients from t2
+#     if t2.requires_grad:
+#         def grad_fn2(grad):
+#             # Sum out added dims
+#             ndims_added = grad.ndim - t2.ndim
+#             for _ in range(ndims_added):
+#                 grad = grad.sum(axis=0)
+#             # Sum across broadcasted (but non-added dims)
+#             for i, dim in enumerate(t2.shape):
+#                 if dim == 1:
+#                     grad = grad.sum(axis=i, keepdims=True)
+#             return grad
+#         hooks.append(nets.Hook(t2, grad_fn2))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def neg(t):
+#     t = nets.to_tensor(t)
+#     data = -t.data
+#     requires_grad = t.requires_grad
+#     hooks = []
+
+#     if requires_grad:
+#         hooks.append(nets.Hook(t, lambda grad: -grad))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def sub(t1, t2):
+#     return add(t1, neg(t2))
+
+
+# def multiply(t1, t2):
+#     t1 = nets.to_tensor(t1)
+#     t2 = nets.to_tensor(t2)
+#     data = np.multiply(t1.data, t2.data)
+#     requires_grad = t1.requires_grad or t2.requires_grad
+#     hooks = []
+
+#     if t1.requires_grad:
+#         def grad_fn1(grad):
+#             grad = grad * t2
+#             # Sum out added dims
+#             ndims_added = grad.ndim - t1.ndim
+#             for _ in range(ndims_added):
+#                 grad = grad.sum(axis=0)
+#             # Sum across broadcasted (but non-added dims)
+#             for i, dim in enumerate(t1.shape):
+#                 if dim == 1:
+#                     grad = grad.sum(axis=i, keepdims=True)
+#             return grad
+
+#         hooks.append(nets.Hook(t1, grad_fn1))
+
+#     if t2.requires_grad:
+#         def grad_fn2(grad):
+#             grad = grad * t1
+#             # Sum out added dims
+#             ndims_added = grad.ndim - t2.ndim
+#             for _ in range(ndims_added):
+#                 grad = grad.sum(axis=0)
+#             # Sum across broadcasted (but non-added dims)
+#             for i, dim in enumerate(t2.shape):
+#                 if dim == 1:
+#                     grad = grad.sum(axis=i, keepdims=True)
+#             return grad
+
+#         hooks.append(nets.Hook(t2, grad_fn2))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def inverse(t):
+#     t = nets.to_tensor(t)
+#     requires_grad = t.requires_grad
+#     hooks = []
+
+#     if requires_grad:
+#         def grad_fn(grad):
+#             return - 1 / (t ** 2) * grad
+
+#         hooks.append(nets.Hook(t, grad_fn))
+
+#     return nets.Tensor(1 / t.data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def div(t1, t2):
+#     t1 = nets.to_tensor(t1)
+#     t2 = nets.to_tensor(t2)
+#     return multiply(t1, inverse(t2))
+
+
+def dot(t1, t2):
+    data = t1.data @ t2.data
+    requires_grad = t1.requires_grad or t2.requires_grad
+    hooks = []
+
+    if t1.requires_grad:
+        def grad_fn1(grad):
+            return grad @ t2.T
+
+        hooks.append(nets.Hook(t1, grad_fn1))
+
+    if t2.requires_grad:
+        def grad_fn2(grad):
+            return t1.T @ grad
+
+        hooks.append(nets.Hook(t2, grad_fn2))
+
+    return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def slice(t, indices):
+#     t = nets.to_tensor(t)
+#     if isinstance(indices, nets.Tensor):
+#         indices = indices.data
+#     data = t.data[indices]
+#     requires_grad = t.requires_grad
+#     hooks = []
+#     if requires_grad:
+#         def grad_fn(grad):
+#             bigger_grad = nets.zeros_like(t)
+#             if grad.shape != bigger_grad.shape:
+#                 bigger_grad[indices] = grad
+#             else:
+#                 bigger_grad = grad
+#             return bigger_grad
+#         hooks.append(nets.Hook(t, grad_fn))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def where(cond, t1, t2):
+#     t1 = nets.to_tensor(t1)
+#     t2 = nets.to_tensor(t2)
+#     # TODO: handle broadcasting with where(): sum across the broadcast dimension
+#     assert t1.shape == t2.shape, f"tensors should have the same shape. Got t1.shape={t1.shape}, t2.shape={t2.shape}"
+
+#     cond = nets.to_array(cond)
+#     data = np.where(cond, t1.data, t2.data)
+#     requires_grad = t1.requires_grad or t2.requires_grad
+#     hooks = []
+#     cond = nets.to_tensor(cond)
+#     if t1.requires_grad:
+#         def grad_fn(grad):
+#             return grad * where(cond, 1, 0)
+#         hooks.append(nets.Hook(t1, grad_fn))
+#     if t2.requires_grad:
+#         def grad_fn(grad):
+#             return grad * where(cond, 0, 1)
+#         hooks.append(nets.Hook(t2, grad_fn))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def maximum(t1, t2):
+#     return where(t1 > t2, t1, t2)
+
+
+# def minimum(t1, t2):
+#     return where(t1 > t2, t2, t1)
+
+
+# def pow(t, power):
+#     assert type(power) == int, "unsupported type {} for power. Currently supported type: int".format(type(power))
+#     t = nets.to_tensor(t)
+#     data = t.data ** power
+#     requires_grad = t.requires_grad
+#     hooks = []
+#     # Update the gradient
+#     if requires_grad:
+#         hooks.append(nets.Hook(t, lambda grad: grad * power * t ** (power - 1)))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def sqrt(t):
+#     t = nets.to_tensor(t)
+#     data = np.sqrt(t.data)
+#     requires_grad = t.requires_grad
+#     hooks = []
+#     # Update the gradient
+#     if requires_grad:
+#         hooks.append(nets.Hook(t, lambda grad: - 1 / (2 * sqrt(t)) * grad))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def exp(t):
+#     data = np.exp(t.data)
+#     requires_grad = t.requires_grad
+#     hooks = []
+#     # Update the gradient
+#     if requires_grad:
+#         hooks.append(nets.Hook(t, lambda grad: grad * nets.to_tensor(data)))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def log(t):
+#     data = np.log(t.data)
+#     requires_grad = t.requires_grad
+#     hooks = []
+#     # Update the gradient
+#     if requires_grad:
+#         hooks.append(nets.Hook(t, lambda grad: grad * div(1, t)))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def softmax(x, axis=0):
+#     e = nets.exp(x)
+#     s = nets.sum(e, axis=axis, keepdims=True)
+#     t = x - nets.log(s)
+#     soft = nets.exp(t)
+#     return soft
+
+
+# def tanh(t):
+#     data = np.tanh(t.data)
+#     requires_grad = t.requires_grad
+#     hooks = []
+#     if requires_grad:
+#         hooks.append(nets.Hook(t, lambda grad: grad * (1 - nets.to_tensor(data) ** 2)))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def tanh_prime(x):
+#     return 1 - np.power(2, np.tanh(x))
+
+
+# def sigmoid(x):
+#     return 1.0 / (1.0 + nets.exp(-x))
+
+
+# def sigmoid_prime(x):
+#     return sigmoid(x) * (1 - sigmoid(x))
+
+
+# def relu(x):
+#     return maximum(nets.zeros_like(x), x)
+
+
+# def relu_prime(x):
+#     return where(x >= 0, nets.ones_like(x), nets.zeros_like(x))
+
+
+# def leaky_relu(x, alpha=0.01):
+#     return where(x > 0, x, x * alpha)
+
+
+# def leaky_relu_prime(x, alpha=0.01):
+#     return where(x > 0, nets.ones_like(x), alpha * nets.ones_like(x))
+
+
+# def transpose(t, indices=None):
+#     t = nets.to_tensor(t)
+#     if indices is None:
+#         indices = tuple(range(t.ndim - 1, -1, -1))
+#     data = t.data.transpose(*indices)
+#     requires_grad = t.requires_grad
+#     hooks = []
+#     if requires_grad:
+#         def grad_fn(grad):
+#             indices_back = tuple(inv_permutation(indices))
+#             grad = grad.transpose(*indices_back)
+#             return grad
+
+#         hooks.append(nets.Hook(t, grad_fn))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def reshape(t, shape):
+#     t = nets.to_tensor(t)
+#     data = t.data.reshape(*shape)
+#     requires_grad = t.requires_grad
+#     hooks = []
+#     if requires_grad:
+#         hooks.append(nets.Hook(t, lambda grad: grad.reshape(*t.shape)))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def pad(t, padding, constant_values=0):
+#     t = nets.to_tensor(t)
+#     data = np.pad(t.data, pad_width=padding, constant_values=constant_values)
+#     requires_grad = t.requires_grad
+#     hooks = []
+#     if requires_grad:
+#         hooks.append(nets.Hook(t, lambda grad: numpy_unpad(grad, padding)))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def max(t, axis=None):
+#     t = nets.to_tensor(t)
+#     data = np.max(t.data, axis=axis)
+#     requires_grad = t.requires_grad
+#     hooks = []
+#     if requires_grad:
+#         def grad_fn(grad):
+#             bigger_grad = np.zeros_like(t.data)
+#             if axis is None:
+#                 # If there is no axis, the argmax is the location of he maximum single element
+#                 max_indices = np.unravel_index(np.argmax(t.data), t.shape)
+#                 bigger_grad[max_indices] = grad
+#             else:
+#                 # If there is an axis, we reconstruct the bigger matrix by 'rolling' on this axis
+#                 max_indices = np.argmax(t.data, axis=axis)
+#                 for i, roll in enumerate(np.rollaxis(bigger_grad, axis)):
+#                     roll += (max_indices == i).astype(int) * grad
+
+#             return nets.to_tensor(bigger_grad)
+
+#         hooks.append(nets.Hook(t, grad_fn))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def argmax(t, axis=None):
+#     t = nets.to_tensor(t)
+#     device = t.device
+#     if axis is None:
+#         return nets.Tensor(np.unravel_index(np.argmax(t.data), t.shape))
+#     else:
+#         return nets.Tensor(np.argmax(t.data, axis=axis))
+
+
+# def flatten(t):
+#     return reshape(t, (t.size,))
+
+
+# ITERABLE = (list, tuple)
+
+
+# def concatenate(iterable):
+#     assert isinstance(iterable, ITERABLE), f'iterable type {type(iterable)} unsupported for `concatenate` function.' \
+#                                            f'Types currently supported are list, tuple.'
+#     requires_grad = False
+#     hooks = []
+#     data = np.array([])
+#     for idx, t in enumerate(iterable):
+#         t = nets.to_tensor(t)
+#         requires_grad = t.requires_grad or requires_grad
+#         if data.size == 0:
+#             data = t.data
+#         else:
+#             data = np.concatenate((data, t.data))
+#         if t.requires_grad:
+#             def grad_fn(grad):
+#                 return grad[idx:idx+t.shape[0]]
+
+#             hooks.append(nets.Hook(t, grad_fn))
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)
+
+
+# def append(t, value):
+#     t = nets.to_tensor(t)
+#     value = nets.to_tensor(value)
+#     requires_grad = False
+#     hooks = []
+#     requires_grad = t.requires_grad or value.requires_grad
+#     if t.size == 0:
+#         data = [value.data]
+#     elif value.size == 0:
+#         data = [t.data]
+#     else:
+#         data = t.data.tolist()
+#         data.append(value.data)
+
+#     if t.requires_grad:
+#         def grad_fn(grad):
+#             return grad[:-1]
+#         hooks.append(nets.Hook(t, grad_fn))
+
+#     if value.requires_grad:
+#         def grad_fn(grad):
+#             return grad[-1]
+#         hooks.append(nets.Hook(value, grad_fn))
+
+#     return nets.Tensor(data, requires_grad=requires_grad, hooks=hooks)

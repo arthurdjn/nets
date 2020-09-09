@@ -13,10 +13,11 @@ Defines basic operations between two tensors, like addition, subtraction, dot pr
 
 # Basic imports
 from abc import ABC, abstractmethod
-from nets.cuda import numpy_or_cupy
+import numpy as np
 
 # NETS package
 import nets
+from nets.cuda import numpy_or_cupy
 from .utils import inv_permutation
 from .hook import Hook
 
@@ -113,13 +114,12 @@ class Transpose(Function):
     def forward(self, tensor):
         if self.indices is None:
             self.indices = tuple(range(tensor.ndim - 1, -1, -1))
-        print(self.indices)
-        data = tensor.data.transpose(self.indices)
+        data = tensor.data.transpose(*self.indices)
         return nets.Tensor(data, requires_grad=tensor.requires_grad, device=tensor.device)
 
     def backward(self, grad):
         indices_back = tuple(inv_permutation(self.indices))
-        grad = grad.transpose(indices_back)
+        grad = grad.transpose(*indices_back)
         return grad
 
 
@@ -134,16 +134,16 @@ class Reshape(Function):
         self.shape = shape
 
     def forward(self, tensor):
-        data = tensor.data.reshape(self.shape)
+        data = tensor.data.reshape(*self.shape)
         return nets.Tensor(data, requires_grad=tensor.requires_grad, device=tensor.device)
 
     def backward(self, grad):
-        return grad.reshape(self.tensor.shape)
+        return grad.reshape(*self.tensor.shape)
 
 
 class Pad(Function):
 
-    #S(t, padding, constant_values=0):
+    # S(t, padding, constant_values=0):
     r"""Reshape a ``Tensor`` to a bigger size and add a ``padding`` on the side, with a ``0`` constant value.
     Args:
         t (Tensor): tensor to transform
@@ -152,27 +152,28 @@ class Pad(Function):
     Returns:
         Tensor
     """
-    
+
     def __init__(self, padding, constant_values=0):
         super(Pad, self).__init__()
         self.padding = padding
         self.constant_values = constant_values
-    
+
     def forward(self, tensor):
         nc = numpy_or_cupy(tensor)
-        data = nc.pad(tensor.data, pad_width=self.padding, constant_values=self.constant_values)
+        data = nc.pad(tensor.data, pad_width=self.padding,
+                      constant_values=self.constant_values)
         return nets.Tensor(data, requires_grad=tensor.requires_grad, device=tensor.device)
-    
+
     def backward(self, grad):
         return nets.unpad(grad, self.padding)
 
 
 class Max(Function):
     r"""Get the maximum from a ``Tensor``.
-    
+
     * :attr:`axis` (int): index of the axis to search.
     """
-    
+
     def __init__(self, axis=None):
         super(Max, self).__init__()
         self.axis = axis
@@ -187,7 +188,8 @@ class Max(Function):
         nc = numpy_or_cupy(grad)
         if self.axis is None:
             # If there is no axis, the argmax is the location of he maximum single element
-            max_indices = nets.unravel_index(nets.argmax(self.tensor), self.tensor.shape)
+            max_indices = nets.unravel_index(
+                nets.argmax(self.tensor), self.tensor.shape)
             bigger_grad[max_indices] = grad
         else:
             # If there is an axis, we reconstruct the bigger matrix by 'rolling' on this axis
@@ -196,51 +198,6 @@ class Max(Function):
                 roll += (max_indices == i).astype(int) * grad
 
         return bigger_grad
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 class Neg(Function):
@@ -345,11 +302,11 @@ class Exp(Function):
 
     def forward(self, tensor):
         nc = numpy_or_cupy(tensor)
-        data = nc.exp(tensor.data)
+        data = np.exp(tensor.data)
         return nets.Tensor(data, requires_grad=tensor.requires_grad, device=tensor.device)
 
     def backward(self, grad):
-        return grad * self.tensor
+        return grad * nets.exp(self.tensor)
 
 
 class Log(Function):

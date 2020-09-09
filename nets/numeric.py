@@ -16,6 +16,144 @@ except Exception as error:
 import nets
 
 
+# def gt(t, other):
+#     t = nets.to_array(t)
+#     other = nets.to_array(other)
+#     cond = t > other
+#     return nets.to_tensor(cond)
+
+
+# def set(t, key, value):
+#     if isinstance(key, nets.Tensor):
+#         key = key.data
+#     elif isinstance(key, tuple):
+#         keys = []
+#         for k in key:
+#             if isinstance(k, nets.Tensor):
+#                 keys.append(k.data)
+#             else:
+#                 keys.append(k)
+#         key = tuple(keys)
+#     t.data[key] = nets.to_tensor(value).data
+
+#     t.detach()
+
+#     return t
+
+
+# def ge(t, other):
+#     t = nets.to_array(t)
+#     other = nets.to_array(other)
+#     cond = t >= other
+#     return nets.to_tensor(cond)
+
+
+# def lt(t, other):
+#     t = nets.to_array(t)
+#     other = nets.to_array(other)
+#     cond = t < other
+#     return nets.to_tensor(cond)
+
+
+# def le(t, other):
+#     t = nets.to_array(t)
+#     other = nets.to_array(other)
+#     cond = t <= other
+#     return nets.to_tensor(cond)
+
+
+# def eq(t, other):
+#     t = nets.to_array(t)
+#     other = nets.to_array(other)
+#     cond = t == other
+#     return nets.to_tensor(cond)
+
+
+# def ne(t, other):
+#     t = nets.to_array(t)
+#     other = nets.to_array(other)
+#     cond = not t == other
+#     return nets.to_tensor(cond)
+
+
+
+# def zeros(shape, *args, **kwargs):
+#     data = np.zeros(shape)
+#     return nets.Tensor(data)
+
+
+# def zeros_like(t, *args, **kwargs):
+#     data = np.zeros_like(t.data)
+#     return nets.Tensor(data, t.requires_grad, *args, **kwargs)
+
+
+# def ones(shape, *args, **kwargs):
+#     data = np.ones(shape)
+#     return nets.Tensor(data)
+
+
+# def ones_like(t, *args, **kwargs):
+#     data = np.ones_like(t.data)
+#     return nets.Tensor(data, t.requires_grad, *args, **kwargs)
+
+
+# def eye(size, *args, **kwargs):
+#     data = np.eye(size)
+#     return nets.Tensor(data)
+
+
+# def identity(size, *args, **kwargs):
+#     data = np.identity(size)
+#     return nets.Tensor(data)
+
+
+# def arange(*args, requires_grad=False):
+#     return nets.Tensor(np.arange(*args), requires_grad)
+
+
+# def astype(t, new_type):
+#     return nets.Tensor(t.data.astype(new_type))
+
+
+# # TODO: move to autograd
+# def concatenate(t1, t2):
+#     return nets.Tensor(np.concatenate(t1.data, t2.data))
+
+
+# # TODO: move to autograd
+# def append(t, value, axis=None):
+#     value = nets.to_array(value)
+#     data = np.append(t.data, value, axis=axis)
+#     return nets.Tensor(data)
+
+# # TODO: vstack, hstack etc. with autograd
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def set(t, key, value):
     r"""Set new value(s) to a tensor.
 
@@ -61,9 +199,9 @@ def gt(t, other):
     Returns:
         Tensor
     """
-    t = nets.to_array(t)
-    other = nets.to_array(other)
-    data = t > other
+    t = nets.to_tensor(t)
+    other = nets.to_tensor(other)
+    data = t.data > other.data
     return nets.Tensor(data, device=t.device)
 
 
@@ -80,9 +218,9 @@ def ge(t, other):
     Returns:
         Tensor
     """
-    t = nets.to_array(t)
-    other = nets.to_array(other)
-    data = t >= other
+    t = nets.to_tensor(t)
+    other = nets.to_tensor(other)
+    data = t.data >= other.data
     return nets.Tensor(data, device=t.device)
 
 
@@ -99,9 +237,9 @@ def lt(t, other):
     Returns:
         Tensor
     """
-    t = nets.to_array(t)
-    other = nets.to_array(other)
-    data = t < other
+    t = nets.to_tensor(t)
+    other = nets.to_tensor(other)
+    data = t.data < other.data
     return nets.Tensor(data, device=t.device)
 
 
@@ -118,9 +256,9 @@ def le(t, other):
     Returns:
         Tensor
     """
-    t = nets.to_array(t)
-    other = nets.to_array(other)
-    data = t <= other
+    t = nets.to_tensor(t)
+    other = nets.to_tensor(other)
+    data = t.data <= other.data
     return nets.Tensor(data, device=t.device)
 
 
@@ -137,9 +275,9 @@ def eq(t, other):
     Returns:
         Tensor
     """
-    t = nets.to_array(t)
-    other = nets.to_array(other)
-    cond = t == other
+    t = nets.to_tensor(t)
+    other = nets.to_tensor(other)
+    cond = t.data == other.data
     return nets.Tensor(cond, device=t.device)
 
 
@@ -156,9 +294,9 @@ def ne(t, other):
     Returns:
         Tensor
     """
-    t = nets.to_array(t)
-    other = nets.to_array(other)
-    data = not t == other
+    t = nets.to_tensor(t)
+    other = nets.to_tensor(other)
+    data = not t.data == other.data
     return nets.Tensor(data, device=t.device)
 
 

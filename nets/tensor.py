@@ -15,7 +15,6 @@ Defines tensors for deep learning application. A tensor is a multi-dimensional a
 import numpy as np
 import logging
 
-from skimage.util import dtype
 try:
     import cupy as cp
 except Exception as error:
@@ -27,13 +26,13 @@ from nets.cuda import numpy_or_cupy
 from nets.utils import BackwardCallError, deprecated
 
 
-def tensor2string(tensor, prefix="", precision=4, separator=', ', floatmode=None, 
+def tensor2string(tensor, prefix="", precision=4, separator=', ', floatmode=None,
                   edgeitems=3, threshold=100, max_line_width=100, suppress_small=True):
     # Representation
     mod = numpy_or_cupy(tensor)
-    array_str = mod.array_str(tensor.data, 
-                              precision=precision, 
-                              max_line_width=max_line_width, 
+    array_str = mod.array_str(tensor.data,
+                              precision=precision,
+                              max_line_width=max_line_width,
                               suppress_small=suppress_small)
     # Prefix
     array_str = f"\n{prefix}".join(array_str.split("\n"))
@@ -96,6 +95,37 @@ def to_cupy(arrayable):
         return cp.array(arrayable)
 
 
+def to_array(arrayable):
+    """Convert an object to a ``cupy.ndarray`` if possible.
+
+    Args:
+        arrayable: object to convert
+
+    Returns:
+        cupy.ndarray
+
+    Example:
+        >>> import cupy as cp
+        >>> from nets.tensor import to_cupy
+        >>> from nets import Tensor
+        >>> array = [0, 1, 2, 3, 4, 4, 6, 7, 8, 9]
+        >>> assert isinstance(to_cupy(array), cp.ndarray)
+            True
+        >>> tensor = Tensor([0, 1, 2, 3, 4, 4, 6, 7, 8, 9])
+        >>> assert isinstance(to_cupy(tensor), cp.ndarray)
+            True
+    """
+    if isinstance(arrayable, np.ndarray):
+        return arrayable
+    elif isinstance(arrayable, cp.ndarray):
+        return arrayable
+    elif isinstance(arrayable, Tensor):
+        if arrayable.device == 'cpu':
+            return np.array(arrayable.data)
+        return cp.array(arrayable.data)
+    return np.array(arrayable)
+
+
 # TODO: recursively check if Tensor are inside a list, array... and delete nested Tensor.
 def to_tensor(tensorable, **kwargs):
     """Convert an object to a ``Tensor`` if possible.
@@ -105,7 +135,7 @@ def to_tensor(tensorable, **kwargs):
 
     Returns:
         Tensor
-    
+
     Example:
         >>> import numpy as np
         >>> from nets.tensor import to_tensor
@@ -148,7 +178,7 @@ class Tensor(object):
     # This is mainly for debugging and visualization
     _COUNTER = 0
 
-    def __init__(self, data, requires_grad=False, device="cpu"):
+    def __init__(self, data, requires_grad=False, device="cpu", hooks=None):
         self._device = device
         # Load the data to the right device (either CPU or GPU)
         if device == 'cpu':
@@ -157,7 +187,7 @@ class Tensor(object):
             data = to_cupy(data)
         self._data = data
         self.requires_grad = requires_grad
-        self._hooks = []
+        self._hooks = hooks or []
         self.grad = None
         # Update the tracking
         self._id = Tensor._COUNTER
@@ -286,7 +316,7 @@ class Tensor(object):
 
         # Update the gradient
         # NOTE: the gradients accumulate !
-        self.grad.data = self.grad.data + grad.data  # type: ignore
+        self.grad = self.grad + grad  # type: ignore
 
         # Back-propagation in all dependencies
         hooks = self._hooks
@@ -298,8 +328,8 @@ class Tensor(object):
                 hook.tensor.backward(backward_grad)
 
         # TODO: handle properly nodes and leaf from different hooks
-        #?: maybe add Variable class / is_leaf attributes
-        #?: and counter to skip gradients that don't need to be set
+        # ?: maybe add Variable class / is_leaf attributes
+        # ?: and counter to skip gradients that don't need to be set
 
     def item(self):
         r"""
@@ -341,7 +371,7 @@ class Tensor(object):
         """
         return nets.sum(self, axis=axis, keepdims=keepdims)
 
-    def transpose(self, indices):
+    def transpose(self, *indices):
         r"""Transpose the ``Tensor``. The operation is not in-place.
 
         Args:
@@ -352,7 +382,7 @@ class Tensor(object):
         """
         return nets.transpose(self, indices)
 
-    def reshape(self, shape):
+    def reshape(self, *shape):
         r"""Reshape a ``Tensor`` with a new shape. The transformation is not made in-place.
 
         .. note::
@@ -398,95 +428,76 @@ class Tensor(object):
                                     threshold=100,
                                     max_line_width=100)
         requires_grad = "" if not self.requires_grad else f", requires_grad={self.requires_grad}"
-        return f"Tensor({string_data}{requires_grad})"
+        return f"Tensor({string_data}{requires_grad}, device={self.device})"
 
     def __len__(self):
         return len(self.data)
 
     def __gt__(self, other):
-        other = nets.to_tensor(other, device=self.device)
         return nets.gt(self, other)
 
     def __ge__(self, other):
-        other = nets.to_tensor(other, device=self.device)
         return nets.ge(self, other)
 
     def __lt__(self, other):
-        other = nets.to_tensor(other, device=self.device)
         return nets.lt(self, other)
 
     def __le__(self, other):
-        other = nets.to_tensor(other, device=self.device)
         return nets.le(self, other)
 
     def __eq__(self, other):
-        other = to_tensor(other, device=self.device)
         return nets.eq(self, other)
 
     def __ne__(self, other):
-        other = nets.to_tensor(other, device=self.device)
         return nets.ne(self, other)
 
     def __add__(self, other):
-        other = nets.to_tensor(other, device=self.device)
         return nets.add(self, other)
 
     def __radd__(self, other):
-        other = to_tensor(other, device=self.device)
         return nets.add(other, self)
 
     def __iadd__(self, other):
-        other = nets.to_tensor(other, device=self.device)
-        self.data = self.data + other.data
+        self.data = self.data + nets.to_tensor(other).data
         return self
 
     def __neg__(self):
         return nets.neg(self)
 
     def __sub__(self, other):
-        other = nets.to_tensor(other, device=self.device)
         return nets.sub(self, other)
 
     def __rsub__(self, other):
-        other = nets.to_tensor(other, device=self.device)
         return nets.sub(other, self)
 
     def __isub__(self, other):
-        other = nets.to_tensor(other, device=self.device)
-        self.data = self.data - other.data
+        self.data = self.data - nets.to_tensor(other).data
         return self
 
     def __mul__(self, other):
-        other = nets.to_tensor(other, device=self.device)    
         return nets.multiply(self, other)
 
     def __rmul__(self, other):
-        other = nets.to_tensor(other, device=self.device)
         return nets.multiply(other, self)
 
     def __imul__(self, other):
-        other = nets.to_tensor(other, device=self.device)
-        self.data = self.data * other.data
+        self.data = self.data * nets.to_tensor(other).data
         return self
 
     def __pow__(self, power, modulo=None):
         return nets.pow(self, power)
 
     def __truediv__(self, other):
-        other = to_tensor(other, device=self.device)
         return nets.div(self, other)
 
     def __rtruediv__(self, other):
-        other = nets.to_tensor(other, device=self.device)
         return nets.div(other, self)
 
     def __itruediv__(self, other):
-        other = nets.to_tensor(other, device=self.device)
-        self.data = self.data / other.data
+        self.data = self.data / nets.to_tensor(other).data
         return self
 
     def __matmul__(self, other):
-        other = nets.to_tensor(other, device=self.device)
         return nets.dot(self, other)
 
     def __getitem__(self, indices):

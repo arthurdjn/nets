@@ -172,9 +172,9 @@ class Where(Operation):
 
     def forward(self, tensor1, tensor2):
         nc = numpy_or_cupy(tensor1, tensor2)
-        data = nc.where(self.cond, tensor1.data, tensor2.data)
+        data = nc.where(self.cond.data, tensor1.data, tensor2.data)
         requires_grad = tensor1.requires_grad or tensor2.requires_grad
-        device = tensor1.requires_grad
+        device = tensor1.device
         return nets.Tensor(data, requires_grad=requires_grad, device=device)
 
     def backward1(self, grad):
