@@ -13,7 +13,7 @@ Defines basic operations between two tensors, like addition, subtraction, dot pr
 
 # Basic imports
 from abc import ABC, abstractmethod
-from nets.cuda import numpy_or_cupy, scalar_to_device
+from nets.cuda import numpy_or_cupy
 
 # NETS package
 import nets

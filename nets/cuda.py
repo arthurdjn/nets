@@ -20,19 +20,21 @@ def numpy_or_cupy(*tensors):
         module
     """
     module = __import__("numpy")
-    devices = [t.device == 'cuda' for t in tensors]
-    if np.mean(devices) == 1:
-        try:
-            return __import__("cupy")
-        except Exception as error:
-            logging.error(f"CuPy is not imported. ERROR: {error}")
-    elif np.mean(devices) == 0:
+    device = np.mean([t.device == 'cuda' for t in tensors])
+
+    if device == 1:
+        return __import__("cupy")
+    elif device == 0:
         return module
     else:
         logging.error(f"Cannot compute from tensors on different devices. "
                       f"Got {', '.join([t.device for t in tensors])}.")
 
 
-def scalar_to_device(tensor, scalar):
-    if scalar.shape == () and tensor.device != 'cpu':
-        scalar.cuda()
+def scalars_to_device(*tensors):
+    device = np.mean([t.device == 'cuda' for t in tensors])
+    # Put scalars to cuda if one tensor or more is on GPU
+    if device > 0:
+        for tensor in tensors:
+            if tensor.shape == ():
+                tensor.cuda()

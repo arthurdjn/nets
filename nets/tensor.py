@@ -145,7 +145,7 @@ class Tensor(object):
 
     # Objects instance are heavy-weight in Python.
     # Setting slots free memory, and does not keep built-in functions (__builtin__ things)
-    __slots__ = '_data', 'requires_grad', '_hooks', 'grad', '_id', '_device'
+    __slots__ = '_data', 'requires_grad', '_hooks', '_grad_fn', '_grad', '_id', '_version', '_device'
 
     # A global parameter to track how many `Tensor` have been instantiate.
     # This is mainly for debugging and visualization
@@ -161,17 +161,30 @@ class Tensor(object):
         self._data = data
         self.requires_grad = requires_grad
         self._hooks = hooks or []
-        self.grad = None
+        self._grad_fn = None
+        self._grad = None
         # Update the tracking
+        self._version = 0
         self._id = Tensor._COUNTER
         Tensor._COUNTER += 1
-
-        if self.requires_grad:
-            self.zero_grad()
 
     @property
     def device(self):
         return self._device.lower()
+
+    @property
+    def grad(self):
+        return self._grad
+
+    @property
+    def grad_fn(self):
+        return self._grad_fn
+
+    @property
+    def is_leaf(self):
+        if self._grad_fn is None and self._hooks == []:
+            return True
+        return False
 
     @property
     def data(self):
@@ -203,6 +216,10 @@ class Tensor(object):
     def dtype(self, new_dtype):
         self._data = self._data.astype(new_dtype)
         self.detach()
+
+    @property
+    def version(self):
+        return self._version
 
     @property
     def id(self):
@@ -243,7 +260,8 @@ class Tensor(object):
         Returns:
             None
         """
-        self.grad = None
+        self._grad = None
+        self._grad_fn = None
         self._hooks = []
 
     def zero_grad(self):
@@ -253,7 +271,9 @@ class Tensor(object):
         Returns:
             None
         """
-        self.grad = nets.zeros(self.shape, device=self.device, dtype='float64')
+        self.detach()
+        self._grad = nets.zeros(
+            self.shape, device=self.device, dtype='float64')
 
     def backward(self, grad=None):
         r"""Compute a single backward pass on all ``Tensor`` linked to this one.
@@ -289,7 +309,9 @@ class Tensor(object):
 
         # Update the gradient
         # NOTE: the gradients accumulate !
-        self.grad = self.grad + grad  # type: ignore
+        # self._grad = self._grad + grad  # type: ignore
+        if self.is_leaf:
+            self._grad = self._grad + grad if self._grad is not None else grad
 
         # Back-propagation in all dependencies
         hooks = self._hooks
@@ -299,6 +321,14 @@ class Tensor(object):
                 backward_grad = hook.grad_fn(grad)
                 # Back-propagate in the tensor used in this operation
                 hook.tensor.backward(backward_grad)
+
+        # if self._grad_fn is not None:
+        #     tensors = self._grad_fn.tensors
+        #     grads = self._grad_fn.backward(grad)
+        #     grads = grads if isinstance(grads, tuple) else (grads,)
+        #     for tensor, grad in zip(tensors, grads):
+        #         if tensor.requires_grad:
+        #             tensor.backward(grad)
 
         # TODO: handle properly nodes and leaf from different hooks
         # ?: maybe add Variable class / is_leaf attributes
@@ -470,6 +500,7 @@ class Tensor(object):
 
     def __iadd__(self, other):
         self.data = self.data + nets.to_tensor(other).data
+        self._version += 1
         return self
 
     def __neg__(self):
@@ -483,6 +514,7 @@ class Tensor(object):
 
     def __isub__(self, other):
         self.data = self.data - nets.to_tensor(other).data
+        self._version += 1
         return self
 
     def __mul__(self, other):
@@ -493,6 +525,7 @@ class Tensor(object):
 
     def __imul__(self, other):
         self.data = self.data * nets.to_tensor(other).data
+        self._version += 1
         return self
 
     def __pow__(self, power, modulo=None):
@@ -506,6 +539,7 @@ class Tensor(object):
 
     def __itruediv__(self, other):
         self.data = self.data / nets.to_tensor(other).data
+        self._version += 1
         return self
 
     def __matmul__(self, other):
