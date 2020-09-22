@@ -13,7 +13,7 @@ Defines basic operations between two tensors, like addition, subtraction, dot pr
 
 # Basic imports
 from abc import ABC, abstractmethod
-from nets.cuda import numpy_or_cupy, scalar_to_device
+from nets.cuda import numpy_or_cupy, scalars_to_device
 
 # NETS package
 import nets
@@ -21,17 +21,13 @@ from .hook import Hook
 
 
 class Operation(ABC):
+    
+    __slots__ = 'tensor1', 'tensor2'
+    
     def __init__(self):
         super(Operation, self).__init__()
         self.tensor1 = None
         self.tensor2 = None
-
-    @staticmethod
-    def _move_scalar_to_device(tensor1, tensor2):
-        if tensor1.shape == () and tensor2.device != 'cpu':
-            tensor1.cuda()
-        elif tensor2.shape == () and tensor1.device != 'cpu':
-            tensor2.cuda()
 
     @abstractmethod
     def forward(self, tensor1, tensor2):
@@ -47,7 +43,7 @@ class Operation(ABC):
 
     def __call__(self, tensor1, tensor2):
         # Save the inputs in `cache`
-        self._move_scalar_to_device(tensor1, tensor2)
+        scalars_to_device(tensor1, tensor2)
         self.tensor1 = tensor1
         self.tensor2 = tensor2
         # Result of the operation
@@ -157,7 +153,7 @@ class Dot(Operation):
         return grad @ self.tensor2.T
 
     def backward2(self, grad):
-        return grad @ self.tensor1.T
+        return self.tensor1.T @ grad
 
 
 class Where(Operation):
@@ -176,11 +172,13 @@ class Where(Operation):
     * :attr:`cond` (bool): condition to merge two tensors.
     """
 
+    __slots__ = 'tensor1', 'tensor2', 'cond'
+
     def __init__(self, cond):
         self.cond = cond
 
     @staticmethod
-    def _move_scalars_to_device(cond, tensor1, tensor2):
+    def scalars_to_device(cond, tensor1, tensor2):
         if tensor1.shape == ():
             if tensor2.device != 'cpu' or cond.device != 'cpu':
                 tensor1.cuda()
@@ -189,7 +187,7 @@ class Where(Operation):
                 tensor2.cuda()
 
     def forward(self, tensor1, tensor2):
-        self._move_scalars_to_device(self.cond, tensor1, tensor2)
+        scalars_to_device(self.cond, tensor1, tensor2)
         nc = numpy_or_cupy(tensor1, tensor2)
         data = nc.where(self.cond.data, tensor1.data, tensor2.data)
         requires_grad = tensor1.requires_grad or tensor2.requires_grad

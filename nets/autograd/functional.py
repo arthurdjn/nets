@@ -275,25 +275,8 @@ def dot(t1, t2):
     """
     t1 = nets.to_tensor(t1)
     t2 = nets.to_tensor(t2)
-    data = t1.data @ t2.data
-    requires_grad = t1.requires_grad or t2.requires_grad
-    hooks = []
-
-    if t1.requires_grad:
-        def grad_fn1(grad):
-            return grad @ t2.T
-
-        hooks.append(nets.Hook(t1, grad_fn1))
-
-    if t2.requires_grad:
-        def grad_fn2(grad):
-            return t1.T @ grad
-
-        hooks.append(nets.Hook(t2, grad_fn2))
-
-    return nets.Tensor(data, requires_grad=requires_grad, device=t1.device, hooks=hooks)
-
-
+    operation = op.Dot()
+    return operation(t1, t2)
 
 
 def slice(t, indices):

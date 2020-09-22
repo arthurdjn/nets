@@ -15,7 +15,7 @@ def readme_data():
 find_packages()
 
 setup(name='nets',
-      version='0.0.2',
+      version='0.0.3',
       description='Neural Network with NumPy.',
       long_description=readme_data(),
       long_description_content_type="text/markdown",
@@ -24,8 +24,7 @@ setup(name='nets',
       author_email='arthur.dujardin@ensg.eu',
       license='Apache License-2.0',
 
-      install_requires=['torch', 'numpy', 'pandas',
-                        'sklearn', 'scipy'],
+      install_requires=['numpy'],
       packages=find_packages(),
       # namespace_packages = ['nets'],
       zip_safe=False,

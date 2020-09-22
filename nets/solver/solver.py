@@ -49,21 +49,8 @@ class Solver(ABC):
         checkpoint (dict): checkpoint of the best model tested.
         criterion (Loss): loss function.
         optimizer (Optimizer): optimizer for weights and biases.
-        performance (dict):
-            - train (dict):
-                - loss (list(float))
-                - accuracy (list(float))
-                - precision (list(float))
-                - recall (list(float))
-                - macro_f1 (list(float))
-                - confusion_matrix (list(list(list(int))))
-            - eval (dict):
-                - loss (list(float))
-                - accuracy (list(float))
-                - precision (list(float))
-                - recall (list(float))
-                - macro_f1 (list(float))
-                - confusion_matrix (list(list(list(int))))
+        performance (dict): performance and scores accumulated during the training loop.
+        
     """
 
     def __init__(self, model=None, criterion=None, optimizer=None):

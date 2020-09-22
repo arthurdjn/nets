@@ -41,13 +41,13 @@ def tensor2string(tensor, prefix="", precision=4, separator=', ', floatmode=None
 
 def to_numpy(arrayable):
     """Convert an object to a ``numpy.ndarray`` if possible.
-
+    
     Args:
         arrayable: object to convert
-
+    
     Returns:
         numpy.ndarray
-
+        
     Example:
         >>> import numpy as np
         >>> from nets.tensor import to_numpy
@@ -71,13 +71,13 @@ def to_numpy(arrayable):
 
 def to_cupy(arrayable):
     """Convert an object to a ``cupy.ndarray`` if possible.
-
+    
     Args:
         arrayable: object to convert
-
+    
     Returns:
         cupy.ndarray
-
+    
     Example:
         >>> import cupy as cp
         >>> from nets.tensor import to_cupy
@@ -102,13 +102,10 @@ def to_cupy(arrayable):
 # TODO: recursively check if Tensor are inside a list, array... and delete nested Tensor.
 def to_tensor(tensorable, **kwargs):
     """Convert an object to a ``Tensor`` if possible.
-
     Args:
         tensorable: object to convert
-
     Returns:
         Tensor
-
     Example:
         >>> import numpy as np
         >>> from nets.tensor import to_tensor
@@ -129,23 +126,23 @@ def to_tensor(tensorable, **kwargs):
 class Tensor(object):
     """A Tensor is a multi dimensional array that tracks and records previous gradients, creating a dynamic
     computational graph.
-
+    
     * :attr:`data` (numpy.ndarray): numpy array of the tensor's data.
-
+    
     * :attr:`requires_grad` (bool): if ``True``, will save hooks and create a computational graphs from all previous operations
         leadings to this tensor.
-
+    
     * :attr:`_hooks` (nets.autograd.Hook): hook(s) leadings to this tensor. Note that this attribute should not be modified manually.
-
+    
     * :attr:`grad` (float): gradient for this tensor.
-
+    
     * :attr:`id` (int): id of the tensor, mainly for debug mode.
-
+    
     """
 
     # Objects instance are heavy-weight in Python.
     # Setting slots free memory, and does not keep built-in functions (__builtin__ things)
-    __slots__ = '_data', 'requires_grad', '_hooks', 'grad', '_id', '_device'
+    __slots__ = '_data', 'requires_grad', '_hooks', '_grad_fn', '_grad', '_id', '_device'
 
     # A global parameter to track how many `Tensor` have been instantiate.
     # This is mainly for debugging and visualization
@@ -161,7 +158,8 @@ class Tensor(object):
         self._data = data
         self.requires_grad = requires_grad
         self._hooks = hooks or []
-        self.grad = None
+        self._grad_fn = None
+        self._grad = None
         # Update the tracking
         self._id = Tensor._COUNTER
         Tensor._COUNTER += 1
@@ -182,6 +180,14 @@ class Tensor(object):
         self._data = new_data
         # Setting the data manually means we invalidate the gradient.
         self.detach()
+
+    @property
+    def grad(self):
+        return self._grad
+
+    @property
+    def grad_fn(self):
+        return self._grad_fn
 
     @property
     def shape(self):
@@ -214,23 +220,19 @@ class Tensor(object):
 
     def register_hook(self, hook):
         """Register a hook to a ``Tensor``
-
+    
         Args:
             hook (Hook): hook to register
-
-        Returns:
-            None
+    
         """
         self._hooks.append(hook)
 
     def astype(self, new_type):
         r"""Set a new type to the ``Tensor``'s data.
-
+        
         Args:
             new_type (type): new type to convert the data
-
-        Returns:
-            None
+        
         """
         self.detach()
         return nets.astype(self, new_type)
@@ -240,20 +242,16 @@ class Tensor(object):
         By calling this method, the attribute ``_hooks`` and ``grad`` are set to their default values,
         ``None``.
 
-        Returns:
-            None
         """
-        self.grad = None
+        self._grad = None
         self._hooks = []
 
     def zero_grad(self):
         r"""Set to a zero ``Tensor`` the gradient. This is call when initializing a ``Tensor`` that requires gradient
         tracking, or re-initialize parameters's gradient after a training loop as they accumulate on each other.
-
-        Returns:
-            None
+        
         """
-        self.grad = nets.zeros(self.shape, device=self.device, dtype='float64')
+        self._grad = nets.zeros(self.shape, device=self.device, dtype='float64')
 
     def backward(self, grad=None):
         r"""Compute a single backward pass on all ``Tensor`` linked to this one.
@@ -261,17 +259,15 @@ class Tensor(object):
         The backward pass compute a gradient back-propagation on all ``Tensor`` registered in ``_hooks``.
         The backward pass gradient in ``grad`` attribute (and add upstream gradient if the ``Tensor``
         is used multiple times).
-
-        Args:
-            grad (Tensor): upstream gradient. Default is None, and will be set to ``Tensor(1.0)``, a 0-dimensional
-                ``Tensor``.
-
-        Returns:
-            None
-
+        
         .. note::
             To be able to back-propagate, the top-level ``Tensor`` must have ``requires_grad`` set to ``True``
             to propagate the gradient.
+        
+        Args:
+            grad (Tensor): upstream gradient. Default is None, and will be set to ``Tensor(1.0)``, a 0-dimensional
+                ``Tensor``.
+        
         """
         # Check if the backward pass is legit
         if not self.requires_grad:
@@ -289,7 +285,7 @@ class Tensor(object):
 
         # Update the gradient
         # NOTE: the gradients accumulate !
-        self.grad = self.grad + grad  # type: ignore
+        self._grad = grad if self._grad is None else self._grad + grad
 
         # Back-propagation in all dependencies
         hooks = self._hooks
@@ -306,29 +302,23 @@ class Tensor(object):
 
     def to(self, device):
         """Change the device where the tensor is located.
-
+        
         Args:
             device (str): Name of the device to save the tensor. Options are ``'cuda'`` or ``'cpu'``.
 
-        Returns:
-            Tensor
         """
         return Tensor(self.data, requires_grad=self.requires_grad, device=device)
 
     def cpu(self):
         """Move the location of the tensor to the CPU.
-
-        Returns:
-            Tensor
+        
         """
         self.data = self.to('cpu').data
         self._device = 'cpu'
 
     def cuda(self):
         """Move the location of the tensor to the GPU.
-
-        Returns:
-            Tensor
+        
         """
         self.data = self.to('cuda').data
         self._device = 'cuda'
@@ -337,9 +327,7 @@ class Tensor(object):
         r"""
         Get the item (float, int etc.) of a 0-dimensional ``Tensor``. It will detach the tensor from the computational
         graph by setting ``_hooks = []`` and ``grad = None`` to free memory and send this graph to the garbage collector.
-
-        Returns:
-            Any
+        
         """
         self.detach()
         return self.data.item()
@@ -347,85 +335,67 @@ class Tensor(object):
     def tolist(self):
         r"""Convert the ``Tensor`` data to a list (of list eventually).
 
-        Returns:
-            list
         """
         self.detach()
         return self.data.tolist()
 
     def numpy(self):
         r"""Convert the ``Tensor`` data to a ``numpy.ndarray`` object.
-
-        Returns:
-            numpy.ndarray
+        
         """
         self.detach()
         return to_numpy(self.data)
 
     def cupy(self):
         r"""Convert the ``Tensor`` data to a ``numpy.ndarray`` object.
-
-        Returns:
-            numpy.ndarray
+        
         """
         self.detach()
         return to_cupy(self.data)
 
     def sum(self, axis=None, keepdims=False):
         r"""Sum the data along a given axis. If no axis are specified, all values within the ``Tensor`` will be summed.
-
+        
         Args:
             axis (int): the index of the axis to sum on.
-
-        Returns:
-            Tensor
+        
         """
         return nets.sum(self, axis=axis, keepdims=keepdims)
 
     def transpose(self, *indices):
         r"""Transpose the ``Tensor``. The operation is not in-place.
-
+        
         Args:
             indices (tuple): permutation
-
-        Returns:
-            Tensor
+        
         """
         return nets.transpose(self, indices)
 
     def reshape(self, *shape):
         r"""Reshape a ``Tensor`` with a new shape. The transformation is not made in-place.
-
+        
         .. note::
-
             The new shape must have the same size of the actual shape.
             If its not the case, the reshape method will raise an error.
-
+       
         Args:
             *shapes int: permutation
-
-        Returns:
-            Tensor
+        
         """
         return nets.reshape(self, shape)
 
     def flatten(self):
         r"""Flatten a ``Tensor`` with a new shape. The transformation is not made in-place.
 
-        Returns:
-            Tensor
         """
         return nets.flatten(self)
 
     def append(self, t, axis=0):
         r"""
         Append a value(- or tensor) to a ``Tensor``.
-
+        
         Args:
             t (scale, Tensor): object to add
-
-        Returns:
-            None
         """
         return nets.append(self, t, axis=axis)
 

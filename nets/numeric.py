@@ -3,17 +3,16 @@ The ``functional`` modules defines basic functions to generate tensors and trans
 """
 
 # Basic imports
-import logging
-from nets.cuda import numpy_or_cupy
-from nets.data import dataset
 import numpy as np
 try:
     import cupy as cp
 except Exception as error:
-    logging.error(f"Could not import module cupy. {error}")
+    pass
 
 # NETS Package
 import nets
+from nets.cuda import numpy_or_cupy
+from nets.data import dataset
 
 
 def set(t, key, value):

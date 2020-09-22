@@ -40,10 +40,7 @@ class DNN(Module):
 
     def init_parameters(self):
         """Initialize the parameters dictionary.
-        For Dense Neural Network, the parameters are either weights or biases. They are saved in the dictionary
-        with the following keys:
-            - w_{i}: weight matrix at layer i,
-            - b_{i}: bias vector at layer i.
+        For Dense Neural Network, the parameters are either weights :math:`W` or biases :math:`b`.
 
         """
         # Create the weights and biases
