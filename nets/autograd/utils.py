@@ -7,15 +7,6 @@
 # Copyright (c) 2020 Arthur Dujardin
 
 
-# Basic imports
-import numpy as np
-import logging
-try:
-    import cupy as cp
-except Exception as error:
-    logging.error(f"CuPy not imported. {error}")
-
-
 def inv_permutation(permutation):
     """Get the inverse of a permutation. Used to invert a transposition for example.
 

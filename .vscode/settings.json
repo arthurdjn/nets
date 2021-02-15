@@ -46,7 +46,7 @@
             ]
         },
     ],
-    "python.pythonPath": "C:\\Programs\\anaconda3\\python.exe",
+    "python.pythonPath": "venv\\Scripts\\python.exe",
     "cSpell.words": [
         "astype"
     ]

@@ -6,7 +6,7 @@ The ``functional`` modules defines basic functions to generate tensors and trans
 import numpy as np
 try:
     import cupy as cp
-except Exception as error:
+except ModuleNotFoundError:
     pass
 
 # NETS Package

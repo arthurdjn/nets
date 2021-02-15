@@ -15,7 +15,7 @@ def readme_data():
 find_packages()
 
 setup(name='nets',
-      version='0.0.3',
+      version='0.0.3.1',
       description='Neural Network with NumPy.',
       long_description=readme_data(),
       long_description_content_type="text/markdown",

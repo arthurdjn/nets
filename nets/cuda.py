@@ -8,8 +8,32 @@
 
 
 # Basic imports
-import numpy as np
+import numpy
 import logging
+
+
+CUDA_AVAILABLE = False
+try:
+    import cupy
+    CUDA_AVAILABLE = True
+except ModuleNotFoundError:
+    pass
+
+
+__all__ = [
+    "cuda_available",
+    "numpy_or_cupy",
+    "scalars_to_device"
+]
+
+
+def cuda_available():
+    """Check if `CUDA` is available.
+
+    Returns:
+        bool
+    """
+    return CUDA_AVAILABLE
 
 
 def numpy_or_cupy(*tensors):
@@ -19,20 +43,18 @@ def numpy_or_cupy(*tensors):
     Returns:
         module
     """
-    module = __import__("numpy")
-    device = np.mean([t.device == 'cuda' for t in tensors])
-
+    device = numpy.mean([t.device == 'cuda' for t in tensors])
     if device == 1:
-        return __import__("cupy")
+        return cupy
     elif device == 0:
-        return module
+        return numpy
     else:
         logging.error(f"Cannot compute from tensors on different devices. "
                       f"Got {', '.join([t.device for t in tensors])}.")
 
 
 def scalars_to_device(*tensors):
-    device = np.mean([t.device == 'cuda' for t in tensors])
+    device = numpy.mean([t.device == 'cuda' for t in tensors])
     # Put scalars to cuda if one tensor or more is on GPU
     if device > 0:
         for tensor in tensors:

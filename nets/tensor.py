@@ -13,24 +13,22 @@ Defines tensors for deep learning application. A tensor is a multi-dimensional a
 
 # Basic imports
 import numpy as np
-import logging
-
 try:
     import cupy as cp
-except Exception as error:
-    logging.error(f"Cannot import CuPy. {error}")
+except ModuleNotFoundError:
+    pass
 
 # NETS package
 import nets
-from nets.cuda import numpy_or_cupy
-from nets.utils import BackwardCallError, deprecated
+from nets.cuda import numpy_or_cupy, cuda_available
+from nets.utils import BackwardCallError, CUDANotAvailableError, deprecated
 
 
 def tensor2string(tensor, prefix="", precision=4, separator=', ', floatmode=None,
                   edgeitems=3, threshold=100, max_line_width=100, suppress_small=True):
     # Representation
-    mod = numpy_or_cupy(tensor)
-    array_str = mod.array_str(tensor.data,
+    nc = numpy_or_cupy(tensor)
+    array_str = nc.array_str(tensor.data,
                               precision=precision,
                               max_line_width=max_line_width,
                               suppress_small=suppress_small)
@@ -63,7 +61,7 @@ def to_numpy(arrayable):
         return np.array(arrayable.data)
     elif isinstance(arrayable, np.ndarray):
         return arrayable
-    elif isinstance(arrayable, cp.ndarray):
+    elif cuda_available() and isinstance(arrayable, cp.ndarray):
         return cp.asnumpy(arrayable)
     else:
         return np.array(arrayable)
@@ -89,6 +87,8 @@ def to_cupy(arrayable):
         >>> assert isinstance(to_cupy(tensor), cp.ndarray)
             True
     """
+    if not cuda_available():
+        raise CUDANotAvailableError("Could not move a tensor to GPU because CUDA was not found.")
     if isinstance(arrayable, Tensor):
         return cp.array(arrayable.data)
     elif isinstance(arrayable, np.ndarray):

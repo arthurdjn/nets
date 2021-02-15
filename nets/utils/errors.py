@@ -9,3 +9,9 @@ class BackwardCallError(Exception):
     """
     pass
 
+
+class CUDANotAvailableError(Exception):
+    """
+    This error is raised if CUDA is not available and the user wants to work with GPU.
+    """
+    pass
