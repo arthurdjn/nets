@@ -2,7 +2,7 @@
 [![pypi](https://img.shields.io/pypi/v/nets)](https://pypi.org/project/nets/)
 [![status](https://img.shields.io/pypi/status/nets)](https://pypi.org/project/nets/)
 [![docs](https://img.shields.io/readthedocs/lyricsfandom)](https://arthurdjn.github.io/nets/)
-[![website](https://img.shields.io/website?url=http%3A%2F%2Farthurdujardin.com%2Fproject%2Fnets.html)](https://arthurdujardin.com/project/nets.html)
+[![website](https://img.shields.io/website?url=http%3A%2F%2Farthurdujardin.com%2Fproject%2Fnets.html)](https://arthurdujardin.com/projects/nets.html)
 
 <img src="img/nets.png" width="100%">
 
